@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LICBook - Tu Biblioteca Personal Local-First</title>
+  <meta name="description" content="LICBook: Biblioteca digital personal y lector interactivo con desplazamiento vertical, horizontal y efecto libro 3D para tus archivos PDF y ePub.">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css?v=3.9">
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('licbook_app_theme') || 'cyber-emerald';
+        document.documentElement.dataset.appTheme = theme;
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation (Desktop) / Bottom Nav (Mobile) -->
+    <aside class="app-sidebar" id="app-sidebar">
+      
+      <!-- Brand Logo & Title -->
+      <div class="brand-header">
+        <img src="assets/logo.png" alt="LICBook Logo" class="brand-logo" id="app-logo">
+        <div class="brand-title-wrap">
+          <span class="brand-title">LICBook</span>
+          <span class="brand-tag">Local-First Reader</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-nav="library" id="nav-btn-library">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 2v20"/><path d="M10 7h6"/><path d="M10 11h6"/>
+          </svg>
+          <span>Biblioteca</span>
+        </button>
+
+        <button class="nav-item" data-nav="reading" id="nav-btn-reading">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>En Lectura</span>
+        </button>
+
+        <button class="nav-item" data-nav="favorites" id="nav-btn-favorites">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Favoritos</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Storage & Mi Biblioteca Box -->
+      <div class="sidebar-storage-box">
+        <div class="storage-status-title">
+          <span class="storage-badge"></span>
+          <span>Repositorio Local</span>
+        </div>
+        <div class="storage-folder-name" id="sidebar-storage-path" title="Carpeta Mi Biblioteca">
+          Mi Biblioteca
+        </div>
+        <!-- Unified Primary Action: Vincular / Sincronizar -->
+        <button class="btn-storage-main" id="btn-sync-directory" title="Vincular o Sincronizar libros">
+          <svg class="sync-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span class="sync-label">Sincronizar</span>
+        </button>
+
+        <button class="btn-storage-purge" id="btn-disconnect-purge" title="Desvincular carpeta y borrar rastro de este navegador">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+            <line x1="12" y1="2" x2="12" y2="12"></line>
+          </svg>
+          <span>Desvincular</span>
+        </button>
+
+        <div class="storage-actions">
+          <button class="btn-storage-sync" id="btn-import-json" title="Cargar / Abrir archivo library.json para ver libros y notas">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Cargar JSON</span>
+          </button>
+          <button class="btn-storage-sync" id="btn-export-json" title="Descargar / Respaldar base de datos library.json">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Exportar</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="main-content">
+      
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        
+        <!-- Search Input -->
+        <div class="search-container">
+          <div class="search-icon-wrapper">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input type="text" id="catalog-search-input" class="search-input" placeholder="Buscar por título, autor, editorial, año o género..." autocomplete="off">
+          <button id="btn-clear-search" class="search-clear-btn" title="Limpiar búsqueda">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <button class="btn-icon header-tour-btn" id="btn-start-tour" title="Recorrido guiado de la aplicación" aria-label="Recorrido guiado de la aplicación">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
+          <a href="manual.html" target="_blank" class="btn-icon header-manual-btn" id="btn-open-manual" title="Manual de Usuario Oficial (Abrir en nueva pestaña)" aria-label="Manual de Usuario Oficial">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 2v20"></path>
+            </svg>
+          </a>
+          <button class="btn-icon header-theme-btn" id="btn-theme-modal" title="Personalizar tema de color" aria-label="Personalizar tema de color">
+            <svg class="header-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>
+            </svg>
+          </button>
+          <button class="btn-primary" id="btn-add-book-header" title="Subir nuevo libro">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Agregar Libro</span>
+          </button>
+        </div>
+
+      </header>
+
+      <!-- Scrollable Catalog Workspace -->
+      <div class="catalog-scroll-area">
+        
+        <!-- Filter Pills Bar (Spotify style) -->
+        <div class="filter-pills-bar">
+          <button class="filter-pill active" data-filter="all">Todos los Libros</button>
+          <button class="filter-pill" data-filter="reading">Leyendo Actualmente</button>
+          <button class="filter-pill" data-filter="favorites">Favoritos</button>
+          <button class="filter-pill" data-filter="completed">Leídos</button>
+        </div>
+
+        <!-- Secondary Filters Row (Genre, Publisher, View Toggle) -->
+        <div class="filters-secondary-row">
+          <div class="filter-dropdowns">
+            <select id="filter-genre-select" class="select-filter" aria-label="Filtrar por género">
+              <option value="">Todos los Géneros</option>
+            </select>
+            <select id="filter-publisher-select" class="select-filter" aria-label="Filtrar por editorial">
+              <option value="">Todas las Editoriales</option>
+            </select>
+          </div>
+
+          <div class="view-mode-toggle">
+            <button class="view-btn active" id="btn-view-grid" title="Vista en cuadrícula">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </button>
+            <button class="view-btn" id="btn-view-list" title="Vista en lista">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Catalog Header Stats -->
+        <div class="catalog-stats-bar">
+          <span id="catalog-stats-count">Cargando biblioteca...</span>
+        </div>
+
+        <!-- Books Grid / List Container -->
+        <div id="books-catalog-container" class="books-grid">
+          <!-- Dynamically populated by catalog.js -->
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Persistent Bottom Mini-Reader Player Bar (Spotify Style) -->
+  <div class="mini-player-bar" id="mini-player-bar">
+    <div class="player-left">
+      <img id="player-cover-thumb" class="player-cover-thumb" src="" alt="Portada actual">
+      <div class="player-info">
+        <div id="player-book-title" class="player-title">Título del Libro</div>
+        <div id="player-book-author" class="player-author">Autor</div>
+      </div>
+    </div>
+
+    <div class="player-center">
+      <div class="player-controls">
+        <button class="btn-player-play" id="btn-player-play" title="Continuar lectura">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="player-progress-row">
+        <span id="player-percent-text">0% leído</span>
+        <div class="player-progress-track">
+          <div id="player-progress-bar" class="player-progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="player-right">
+      <span class="player-page-tag" id="player-page-tag">Pág. 1 / 1</span>
+    </div>
+  </div>
+
+  <!-- Add / Edit Book Modal Dialog -->
+  <div class="modal-overlay" id="book-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 2v20"/>
+          </svg>
+          <span id="modal-title-text">Agregar Libro a Mi Biblioteca</span>
+        </h3>
+        <button class="btn-icon" id="btn-close-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="book-form">
+        <div class="modal-body">
+          
+          <input type="hidden" id="book-id-input" value="">
+
+          <!-- File Upload Dropzone -->
+          <div class="file-dropzone" id="file-dropzone">
+            <div class="dropzone-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="dropzone-label" id="dropzone-file-name">
+              Arrastra aquí tu archivo PDF o ePub o haz clic para seleccionarlo
+            </div>
+            <div class="dropzone-sub">
+              Soporta documentos PDF y libros ePub. La portada de la 1ª página se genera automáticamente.
+            </div>
+            <input type="file" id="book-file-input" accept=".pdf,.epub" style="display: none;">
+          </div>
+
+          <!-- Cover Preview & Custom Cover Picker -->
+          <div class="cover-preview-box" id="cover-preview-section" style="display: none;">
+            <img id="modal-cover-preview" class="modal-cover-img" src="" alt="Vista previa de portada">
+            <div class="cover-preview-info">
+              <span class="form-label" id="cover-source-info">Portada generada automáticamente (Página 1 del PDF)</span>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">
+                Puedes conservar esta primera página o elegir una imagen personalizada para tu catálogo.
+              </p>
+              <button type="button" class="btn-custom-cover" id="btn-pick-custom-cover">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span>Subir portada personalizada</span>
+              </button>
+              <input type="file" id="book-cover-input" accept="image/*" style="display: none;">
+            </div>
+          </div>
+
+          <!-- Metadata Fields -->
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label" for="book-title">Título del Libro *</label>
+              <input type="text" id="book-title" required placeholder="Ej. El Alquimista">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-authors">Autor(es) (separados por coma)</label>
+              <input type="text" id="book-authors" placeholder="Ej. Paulo Coelho">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-genre">Género / Categoría</label>
+              <input type="text" id="book-genre" placeholder="Ej. Ficción, Ciencia, Historia">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-publisher">Editorial</label>
+              <input type="text" id="book-publisher" placeholder="Ej. Planeta, HarperCollins">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-year">Año de Publicación</label>
+              <input type="number" id="book-year" placeholder="Ej. 1988" min="1000" max="2099">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="book-edition">Edición</label>
+              <input type="text" id="book-edition" placeholder="Ej. 1ra Edición Revisada">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="book-description">Resumen / Notas</label>
+              <textarea id="book-description" rows="3" placeholder="Sinopsis breve o notas personales sobre el libro..."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-book">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Guardar en Mi Biblioteca</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bookmark Note / Quote Modal Dialog -->
+  <div class="modal-overlay bookmark-note-modal-overlay" id="bookmark-note-modal-overlay">
+    <div class="modal-card bookmark-note-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span id="bm-modal-title">Nota y Cita del Marcapáginas</span>
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-bm-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="bm-note-form">
+        <div class="modal-body">
+          <input type="hidden" id="bm-modal-page" value="">
+          
+          <div class="bm-modal-page-info">
+            <span class="bm-modal-badge" id="bm-modal-page-badge">Página 1</span>
+            <span class="bm-modal-book" id="bm-modal-book-title">Título del Libro</span>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="bm-quote-input">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -2px; margin-right: 4px; color: var(--brand-gold);">
+                <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+              </svg>
+              Cita o Frase Importante (opcional)
+            </label>
+            <textarea id="bm-quote-input" rows="3" placeholder="Pega o escribe aquí una frase o cita destacada de esta página..."></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="bm-note-input">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px; color: var(--brand-green);">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              Tus Notas o Reflexiones
+            </label>
+            <textarea id="bm-note-input" rows="4" placeholder="Escribe tus notas personales, ideas o reflexiones sobre esta página..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-bm-modal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-bm-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Guardar Nota</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scan & Sync Confirmation Modal Dialog -->
+  <div class="modal-overlay" id="scan-modal-overlay" style="display: none; z-index: 1300;">
+    <div class="modal-card scan-modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Sincronización de Carpeta</span>
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-scan-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="gap: 14px; padding: 22px 24px;">
+        <p id="scan-modal-desc" style="color: var(--text-primary); font-size: 0.95rem; font-weight: 600; line-height: 1.5;">
+          Se encontraron archivos en tu carpeta vinculada.
+        </p>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.45;">
+          Actualmente tienes libros de muestra en tu biblioteca. ¿Deseas reemplazar los libros de muestra con tus libros reales o prefieres conservar ambos?
+        </p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px;">
+        <button type="button" class="btn-secondary" id="btn-scan-keep-both">Conservar ambos</button>
+        <button type="button" class="btn-primary" id="btn-scan-replace-samples">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Reemplazar libros de muestra</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disconnect & Purge Browser Data Confirmation Modal -->
+  <div class="modal-overlay" id="purge-modal-overlay" style="display: none; z-index: 1300;">
+    <div class="modal-card purge-modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+            <line x1="12" y1="2" x2="12" y2="12"></line>
+          </svg>
+          <span>Desvincular y Limpiar Navegador</span>
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-purge-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="gap: 14px; padding: 22px 24px;">
+        <div style="background-color: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>
+            <div style="font-weight: 700; color: #F43F5E; font-size: 0.92rem; margin-bottom: 4px;">
+              Efecto Modo Incógnito (Limpieza total)
+            </div>
+            <div style="font-size: 0.83rem; color: var(--text-secondary); line-height: 1.45;">
+              Se eliminarán de este navegador los libros en caché, notas de la libreta, historial de lectura y los permisos a la carpeta vinculada.
+            </div>
+          </div>
+        </div>
+
+        <div style="background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <div>
+            <div style="font-weight: 700; color: #10B981; font-size: 0.92rem; margin-bottom: 4px;">
+              Tus archivos físicos están 100% seguros
+            </div>
+            <div style="font-size: 0.83rem; color: var(--text-secondary); line-height: 1.45;">
+              Tu archivo <strong>library.json</strong> y tus libros en tu memoria USB o disco <strong>NO se borrarán ni modificarán</strong>. Podrás volver a vincularlos en cualquier momento.
+            </div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin: 4px 0 0 0;">
+          Antes de limpiar, se guardarán los últimos cambios pendientes en tu disco y la página se recargará limpia.
+        </p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" id="btn-cancel-purge">Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-confirm-purge" style="background-color: #E11D48; color: #FFFFFF; border: none; padding: 9px 18px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Desvincular y Limpiar Todo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Book Confirmation Modal -->
+  <div class="modal-overlay" id="delete-book-modal-overlay" style="display: none; z-index: 1300;">
+    <div class="modal-card delete-book-modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Eliminar de la Biblioteca</span>
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-delete-book-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="gap: 14px; padding: 22px 24px;">
+        <div style="background-color: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 8px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>
+            <div style="font-weight: 700; color: #F43F5E; font-size: 0.95rem; margin-bottom: 4px;">
+              ¿Estás seguro de eliminar este libro?
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45;">
+              Se quitará <strong id="delete-book-title-display" style="color: var(--text-primary); font-weight: 700;">este libro</strong> de tu biblioteca personal y se borrará su progreso de lectura local.
+            </div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin: 4px 0 0 0; line-height: 1.45;">
+          El archivo original en tu disco duro o carpeta vinculada <strong>no se modificará ni se borrará</strong>.
+        </p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" id="btn-cancel-delete-book">Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-confirm-delete-book" style="background-color: #E11D48; color: #FFFFFF; border: none; padding: 9px 20px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background-color 0.2s;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Eliminar Libro</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Customizer Modal Dialog -->
+  <div class="modal-overlay" id="theme-modal-overlay" style="display: none; z-index: 1250;">
+    <div class="modal-card theme-modal-card">
+      <div class="modal-header theme-modal-header">
+        <h3 class="modal-title">
+          <svg class="theme-title-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>
+          </svg>
+          <span>Personalizar Tema de Color</span>
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-theme-modal" title="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body theme-modal-body">
+        <p class="theme-modal-subtitle">
+          Selecciona una de las 8 paletas de diseño predefinidas. Tu preferencia se guardará automáticamente.
+        </p>
+
+        <div class="theme-cards-grid">
+          <!-- 1. Obsidian Dark -->
+          <button type="button" class="theme-card" data-theme-id="obsidian-dark">
+            <div class="theme-swatch" style="--swatch-outer: #0F141C; --swatch-border: #312E81; --swatch-inner: #6366F1;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Obsidian Dark</span>
+              <span class="theme-card-desc">Fondo oscuro moderno con acento Índigo</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 2. Cyber Emerald -->
+          <button type="button" class="theme-card" data-theme-id="cyber-emerald">
+            <div class="theme-swatch" style="--swatch-outer: #061A14; --swatch-border: #0F3D30; --swatch-inner: #10B981;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Cyber Emerald</span>
+              <span class="theme-card-desc">Oscuro con acento Verde Esmeralda / Menta</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 3. Nordic Frost -->
+          <button type="button" class="theme-card" data-theme-id="nordic-frost">
+            <div class="theme-swatch" style="--swatch-outer: #07192C; --swatch-border: #0E2E52; --swatch-inner: #06B6D4;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Nordic Frost</span>
+              <span class="theme-card-desc">Azul polar profundo con acento Cian Glaciar</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 4. Sunset Amber -->
+          <button type="button" class="theme-card" data-theme-id="sunset-amber">
+            <div class="theme-swatch" style="--swatch-outer: #1C130B; --swatch-border: #3D2817; --swatch-inner: #F59E0B;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Sunset Amber</span>
+              <span class="theme-card-desc">Carbón cálido con acento Ámbar / Fuego</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 5. Clean Light -->
+          <button type="button" class="theme-card" data-theme-id="clean-light">
+            <div class="theme-swatch" style="--swatch-outer: #F8FAFC; --swatch-border: #3B82F6; --swatch-inner: #2563EB;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Clean Light</span>
+              <span class="theme-card-desc">Tema claro minimalista de alto contraste</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 6. Rose Quartz -->
+          <button type="button" class="theme-card" data-theme-id="rose-quartz">
+            <div class="theme-swatch" style="--swatch-outer: #1C0F1D; --swatch-border: #3D1B40; --swatch-inner: #EC4899;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Rose Quartz</span>
+              <span class="theme-card-desc">Pizarra púrpura con acento Rosa Eléctrico</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 7. Lemon Ice-Cream -->
+          <button type="button" class="theme-card" data-theme-id="lemon-icecream">
+            <div class="theme-swatch" style="--swatch-outer: #FFFDF0; --swatch-border: #FACC15; --swatch-inner: #EAB308;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Lemon Ice-Cream</span>
+              <span class="theme-card-desc">Vainilla cremosa con acento amarillo limón y menta</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+
+          <!-- 8. Iron-Man -->
+          <button type="button" class="theme-card" data-theme-id="iron-man">
+            <div class="theme-swatch" style="--swatch-outer: #1F0A0A; --swatch-border: #451212; --swatch-inner: #EF4444;">
+              <span class="swatch-outer"></span>
+              <span class="swatch-inner"></span>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Iron-Man</span>
+              <span class="theme-card-desc">Armadura carmesí y oro con resplandor reactor Arc</span>
+            </div>
+            <div class="theme-check-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fallback Folder Input (Browser Compatibility) -->
+  <input type="file" id="fallback-folder-input" webkitdirectory directory multiple style="display: none;">
+  <!-- Direct JSON Library Input -->
+  <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
+
+  <!-- Fullscreen Book Reader Overlay -->
+  <div class="reader-container" id="reader-overlay">
+    
+    <!-- Reader Top Toolbar -->
+    <div class="reader-toolbar">
+      
+      <div class="reader-toolbar-left">
+        <button class="btn-icon" id="btn-reader-back" title="Volver a la biblioteca">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <span class="reader-book-title" id="reader-book-title">Cargando libro...</span>
+      </div>
+
+      <!-- Center: Mode Indicator -->
+      <div class="reader-mode-indicator">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+          <line x1="12" y1="6" x2="12" y2="18"></line>
+        </svg>
+        <span>Desplazamiento Vertical</span>
+      </div>
+
+      <!-- Right Tools: Search, Bookmarks, Zoom, Theme, Fullscreen -->
+      <div class="reader-toolbar-right">
+        <!-- In-Book Search Button -->
+        <button class="btn-icon" id="btn-reader-search" title="Buscar texto en el libro (Ctrl + F)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+        <!-- Bookmark Current Page -->
+        <button class="btn-icon" id="btn-reader-bookmark" title="Marcar página actual">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </button>
+
+        <button class="btn-icon" id="btn-zoom-out" title="Reducir zoom">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+
+        <button class="btn-icon" id="btn-zoom-in" title="Aumentar zoom">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+
+        <button class="btn-icon" id="btn-reader-theme" title="Cambiar tema de lectura (Blanco Clásico / Nocturno)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+
+        <button class="btn-icon" id="btn-reader-fullscreen" title="Pantalla completa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Floating Navigation Trigger (TOC & Bookmarks FAB) -->
+    <div class="bookmarks-trigger-wrap reader-floating-toc-wrap">
+      <button class="reader-floating-toc-btn" id="btn-reader-bookmarks-list" title="Ver índice de capítulos y marcapáginas">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span class="bookmark-count-badge" id="reader-bookmark-badge" style="display: none;">0</span>
+      </button>
+
+      <!-- Navigation Dropdown Popover with Tabs -->
+      <div class="bookmarks-popover" id="reader-bookmarks-popover">
+        <div class="nav-popover-tabs">
+          <button type="button" class="nav-popover-tab active" id="tab-btn-toc">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>Índice</span>
+          </button>
+          <button type="button" class="nav-popover-tab" id="tab-btn-bookmarks">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Marcapáginas</span>
+            <span class="tab-badge" id="tab-bookmarks-count">0</span>
+          </button>
+        </div>
+
+        <!-- Content Panel 1: Table of Contents / Outline -->
+        <div class="nav-popover-panel active" id="panel-toc">
+          <div class="toc-list" id="reader-toc-list">
+            <!-- Dynamically populated by reader.js -->
+          </div>
+        </div>
+
+        <!-- Content Panel 2: Bookmarks with Notes -->
+        <div class="nav-popover-panel" id="panel-bookmarks">
+          <div class="bookmarks-popover-list" id="reader-bookmarks-list">
+            <!-- Dynamically populated by reader.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating In-Book Search Bar (Ctrl + F) -->
+    <div class="reader-search-bar" id="reader-search-bar" style="display: none;">
+      <div class="reader-search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="reader-search-input" placeholder="Buscar texto en el libro (Enter)..." autocomplete="off">
+        <span class="search-match-count" id="reader-search-matches-count">0 resultados</span>
+        <button type="button" class="btn-search-nav" id="btn-search-prev" title="Resultado anterior (Shift+Enter)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="btn-search-nav" id="btn-search-next" title="Resultado siguiente (Enter)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="btn-search-close" id="btn-search-close" title="Cerrar búsqueda (Esc)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <!-- Search Results Dropdown List with snippets -->
+      <div class="reader-search-results-dropdown" id="reader-search-results" style="display: none;">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- Reader Dynamic Viewport -->
+    <div class="reader-viewport" id="reader-viewport">
+      <!-- Injected dynamically based on view mode (Vertical, Horizontal, Flip 3D) -->
+    </div>
+
+    <!-- Reader Bottom Controls -->
+    <div class="reader-bottom-bar">
+      <button class="btn-icon" id="btn-page-prev" title="Página anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <input type="range" class="reader-page-slider" id="reader-page-slider" min="1" max="1" value="1" title="Deslizar a página">
+
+      <!-- Direct Manual Page Entry -->
+      <div class="reader-page-jump-container" title="Escribe el número de página y presiona Enter para ir directamente">
+        <span class="reader-page-jump-label">Página</span>
+        <input 
+          type="number" 
+          id="reader-page-input" 
+          class="reader-page-input" 
+          min="1" 
+          max="1" 
+          value="1" 
+          autocomplete="off" 
+          title="Ingresa número de página y presiona Enter"
+        >
+        <span class="reader-page-total" id="reader-page-total">de 1</span>
+        <button type="button" class="btn-page-go" id="btn-page-go" title="Ir a la página">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <button class="btn-icon" id="btn-page-next" title="Página siguiente">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Right-Side Floating Notes Tab (Trigger) -->
+    <button class="reader-notes-tab" id="btn-reader-notes-tab" title="Libreta">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+      </svg>
+      <span class="notes-tab-label">LIBRETA</span>
+    </button>
+
+    <!-- Right-Side Sliding Notes Drawer (Libreta de Apuntes) -->
+    <div class="reader-notes-drawer" id="reader-notes-drawer">
+      <div class="notes-drawer-header">
+        <div class="notes-header-info">
+          <div class="notes-header-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>Libreta de Apuntes</span>
+          </div>
+          <span class="notes-book-title" id="notes-book-title">Cargando libro...</span>
+        </div>
+        <div class="notes-header-actions">
+          <span class="notes-save-status" id="notes-save-status">
+            <span class="save-status-dot"></span> Guardado
+          </span>
+          <button type="button" class="btn-icon" id="btn-close-notes" title="Cerrar libreta de apuntes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes Action Bar: Download .md & Append .md/.txt -->
+      <div class="notes-actions-bar">
+        <button type="button" class="btn-notes-action" id="btn-download-notes" title="Descargar tus apuntes en formato Markdown (.md)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Descargar</span>
+        </button>
+
+        <button type="button" class="btn-notes-action" id="btn-append-notes" title="Anexar información desde un archivo externo (.md o .txt)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+          </svg>
+          <span>Anexar texto</span>
+        </button>
+        <!-- Hidden file input for appending files -->
+        <input type="file" id="notes-file-input" accept=".md,.txt" style="display: none;">
+      </div>
+
+      <!-- Obsidian Markdown Toolbar (Edit/Preview Mode & Formatting Tools) -->
+      <div class="notes-markdown-toolbar" id="notes-markdown-toolbar">
+        <!-- View Mode Switcher (Obsidian style Edit / Preview tabs) -->
+        <div class="notes-view-tabs">
+          <button type="button" class="btn-notes-tab active" id="btn-notes-tab-edit" title="Modo edición Markdown">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Editar</span>
+          </button>
+          <button type="button" class="btn-notes-tab" id="btn-notes-tab-preview" title="Vista previa estilo Obsidian">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <span>Previa</span>
+          </button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Formatting Tools Group -->
+        <div class="notes-tools-group" id="notes-formatting-tools">
+          <!-- Headings H1, H2, H3 -->
+          <div class="tools-subgroup">
+            <button type="button" class="btn-tool" data-action="h1" title="Encabezado 1 (# Título)">H1</button>
+            <button type="button" class="btn-tool" data-action="h2" title="Encabezado 2 (## Título)">H2</button>
+            <button type="button" class="btn-tool" data-action="h3" title="Encabezado 3 (### Título)">H3</button>
+          </div>
+
+          <div class="toolbar-divider-sm"></div>
+
+          <!-- Bold, Italic, Strike, Obsidian Highlight -->
+          <div class="tools-subgroup">
+            <button type="button" class="btn-tool tool-bold" data-action="bold" title="Negrita (**texto**) [Ctrl+B]"><strong>B</strong></button>
+            <button type="button" class="btn-tool tool-italic" data-action="italic" title="Cursiva (*texto*) [Ctrl+I]"><em>I</em></button>
+            <button type="button" class="btn-tool tool-strike" data-action="strike" title="Tachado (~~texto~~)"><s>S</s></button>
+            <button type="button" class="btn-tool tool-highlight" data-action="highlight" title="Resaltado Obsidian (==texto==) [Ctrl+Shift+H]">
+              <span class="tool-highlight-badge">==</span>
+            </button>
+          </div>
+
+          <div class="toolbar-divider-sm"></div>
+
+          <!-- Quotes, Lists, Task checkbox, Code, Divider -->
+          <div class="tools-subgroup">
+            <button type="button" class="btn-tool" data-action="quote" title="Cita (> )">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+            </button>
+            <button type="button" class="btn-tool" data-action="bullet-list" title="Lista de viñetas (- )">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+            <button type="button" class="btn-tool" data-action="task-list" title="Tarea Obsidian (- [ ] )">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><polyline points="9 11 12 14 17 9"></polyline></svg>
+            </button>
+            <button type="button" class="btn-tool" data-action="code" title="Código (`código` o ```bloque)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            </button>
+            <button type="button" class="btn-tool" data-action="hr" title="Separador horizontal (---)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Text Editor Body & Obsidian Preview Body -->
+      <div class="notes-editor-body" id="notes-editor-body">
+        <textarea 
+          id="reader-notes-textarea" 
+          class="reader-notes-textarea" 
+          placeholder="Escribe tus apuntes con formato Markdown tipo Obsidian (# Título, **negrita**, *cursiva*, ==resaltado==, - [ ] tarea)..."
+          spellcheck="false"
+        ></textarea>
+        <div 
+          id="reader-notes-preview" 
+          class="reader-notes-preview" 
+          style="display: none;"
+        ></div>
+      </div>
+
+      <!-- Notes Footer with Statistics -->
+      <div class="notes-drawer-footer">
+        <span id="notes-char-count">0 caracteres</span>
+        <span id="notes-word-count">0 palabras</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Welcome & Tour Invitation Modal for New Users -->
+  <div class="modal-overlay" id="tour-welcome-modal" style="display: none; z-index: 1400;">
+    <div class="modal-card tour-welcome-card" style="max-width: 480px; text-align: center; padding: 32px 28px;">
+      <div class="tour-welcome-icon-wrap">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+          <path d="M6 2v20"></path>
+          <path d="M10 7h6"></path>
+          <path d="M10 11h6"></path>
+        </svg>
+      </div>
+      <h2 class="tour-welcome-title">
+        ¡Te damos la bienvenida a LICBook!
+      </h2>
+      <p class="tour-welcome-subtitle">
+        Tu biblioteca digital personal <strong>Local-First</strong>. Disfruta de tus libros PDF y ePub sin conexión, con 8 temas de color, notas tipo Obsidian y lectura continua.
+      </p>
+      <div class="tour-welcome-tip">
+        <span class="tour-welcome-sparkle">✨</span>
+        <div class="tour-welcome-tip-text">
+          ¿Te gustaría hacer un breve <strong>recorrido interactivo de 1 minuto</strong> para descubrir las funciones principales?
+        </div>
+      </div>
+      <div class="tour-welcome-actions">
+        <button type="button" class="btn-primary" id="btn-tour-start-welcome" style="justify-content: center; padding: 12px 20px; font-size: 0.95rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Iniciar recorrido guiado</span>
+        </button>
+        <button type="button" class="btn-secondary" id="btn-tour-skip-welcome" style="justify-content: center; border: 1px solid var(--border-subtle); border-radius: var(--radius-full); padding: 10px 18px; font-size: 0.88rem;">
+          Explorar por mi cuenta
+        </button>
+        <a href="manual.html" target="_blank" class="tour-welcome-manual-link" style="display: inline-flex; align-items: center; justify-content: center; gap: 7px; margin-top: 14px; font-size: 0.86rem; color: var(--brand-green); text-decoration: none; font-weight: 600; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          <span>Consultar Manual de Usuario Completo</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Guided Tour Spotlight & Popover -->
+  <div id="tour-overlay" class="tour-overlay" style="display: none;">
+    <svg class="tour-spotlight-svg" id="tour-spotlight-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="tour-spotlight-mask">
+          <rect x="0" y="0" width="100%" height="100%" fill="white" />
+          <rect id="tour-spotlight-cutout" x="0" y="0" width="0" height="0" rx="10" ry="10" fill="black" />
+        </mask>
+      </defs>
+      <rect x="0" y="0" width="100%" height="100%" fill="rgba(6, 12, 22, 0.78)" mask="url(#tour-spotlight-mask)" />
+    </svg>
+    <div class="tour-highlight-ring" id="tour-highlight-ring"></div>
+  </div>
+
+  <div id="tour-popover" class="tour-popover" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="tour-step-title">
+    <div class="tour-popover-arrow" id="tour-popover-arrow"></div>
+    <div class="tour-header">
+      <div class="tour-badge">
+        <span class="tour-badge-dot"></span>
+        <span id="tour-step-counter">Paso 1 de 6</span>
+      </div>
+      <button type="button" class="tour-btn-close" id="btn-tour-close" title="Cerrar recorrido (Esc)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="tour-body">
+      <h3 class="tour-title" id="tour-step-title"></h3>
+      <p class="tour-desc" id="tour-step-desc"></p>
+    </div>
+    <div class="tour-footer">
+      <div class="tour-dots" id="tour-progress-dots"></div>
+      <div class="tour-actions">
+        <button type="button" class="tour-btn tour-btn-skip" id="btn-tour-skip">Saltar</button>
+        <button type="button" class="tour-btn tour-btn-prev" id="btn-tour-prev">Anterior</button>
+        <button type="button" class="tour-btn tour-btn-next" id="btn-tour-next">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor Scripts (Pure JS, Offline Local) -->
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/epub.min.js"></script>
+
+  <!-- Application Logic (Pure Vanilla JS) -->
+  <script src="js/icons.js"></script>
+  <script src="js/storage.js?v=3.1"></script>
+  <script src="js/catalog.js?v=3.2"></script>
+  <script src="js/bookModal.js"></script>
+  <script src="js/reader.js?v=3.2"></script>
+  <script src="js/tour.js?v=1.1"></script>
+  <script src="js/app.js?v=3.2"></script>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+%PDF-1.4
+1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
+2 0 obj << /Type /Pages /Kids [3 0 R 4 0 R 5 0 R 6 0 R] /Count 4 >> endobj
+3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 7 0 R /Resources << /Font << /F1 11 0 R >> >> >> endobj
+4 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 8 0 R /Resources << /Font << /F1 11 0 R >> >> >> endobj
+5 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 9 0 R /Resources << /Font << /F1 11 0 R >> >> >> endobj
+6 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 10 0 R /Resources << /Font << /F1 11 0 R >> >> >> endobj
+7 0 obj << /Length 120 >> stream
+BT /F1 24 Tf 80 700 Td (LICBook: Libro de Prueba) Tj /F1 14 Tf 80 660 Td (Primera pagina para extraccion de portada automatica) Tj ET
+endstream endobj
+8 0 obj << /Length 75 >> stream
+BT /F1 18 Tf 80 700 Td (Pagina 2: Introduccion al Lector) Tj ET
+endstream endobj
+9 0 obj << /Length 75 >> stream
+BT /F1 18 Tf 80 700 Td (Pagina 3: Modos de Visualizacion) Tj ET
+endstream endobj
+10 0 obj << /Length 65 >> stream
+BT /F1 18 Tf 80 700 Td (Pagina 4: Fin del Documento) Tj ET
+endstream endobj
+11 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj
+xref
+0 12
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000142 00000 n 
+0000000262 00000 n 
+0000000382 00000 n 
+0000000502 00000 n 
+0000000623 00000 n 
+0000000792 00000 n 
+0000000916 00000 n 
+0000001040 00000 n 
+0000001154 00000 n 
+trailer << /Size 12 /Root 1 0 R >>
+startxref
+1225
+%%EOF

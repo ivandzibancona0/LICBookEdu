@@ -1,0 +1,77 @@
+# ==============================================================================
+# LICBook - .gitignore
+# ==============================================================================
+
+# Operating System Files
+# ----------------------
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r\r
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# IDEs & Code Editors
+# -------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+.#*
+
+# Node & Package Managers
+# -----------------------
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Logs, Cache & Temporary Files
+# -----------------------------
+*.log
+.cache/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Environment & Local Secrets
+# ---------------------------
+.env
+.env.local
+.env.*.local
+
+# Backups & Local User Data
+# -------------------------
+licbook_backup*.json
+library_backup*.json
+
+# Ignore loose personal books added directly to root (keep sample book in assets/)
+/*.pdf
+/*.epub
+!assets/libro_muestra.pdf

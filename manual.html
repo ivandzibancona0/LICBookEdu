@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="es" data-manual-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LICBook - Manual de Usuario Oficial</title>
+  <meta name="description" content="Manual de usuario completo de LICBook: funciones, botones, modos de lectura 3D, libreta Markdown tipo Obsidian y guía de compatibilidad de navegadores.">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       Design System & Variables (Cyber Emerald Palette)
+       ========================================================================== */
+    :root {
+      --bg-base: #060c14;
+      --bg-surface: #0a1320;
+      --bg-card: #0d1a2d;
+      --bg-card-hover: #12233c;
+      --bg-glass: rgba(13, 26, 45, 0.85);
+      
+      --brand-green: #10b981;
+      --brand-green-hover: #059669;
+      --brand-green-glow: rgba(16, 185, 129, 0.25);
+      --brand-cyan: #06b6d4;
+      --brand-amber: #f59e0b;
+      --brand-red: #ef4444;
+      --brand-purple: #8b5cf6;
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --border-subtle: #1e293b;
+      --border-strong: #334155;
+      --border-accent: rgba(16, 185, 129, 0.4);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 25px rgba(16, 185, 129, 0.2);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      --sidebar-width: 290px;
+    }
+
+    /* Light Mode Option for Manual */
+    html[data-manual-theme="light"] {
+      --bg-base: #f8fafc;
+      --bg-surface: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --bg-glass: rgba(255, 255, 255, 0.9);
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --border-accent: rgba(16, 185, 129, 0.5);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-primary);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    code, kbd {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.88em;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 0 var(--border-strong);
+      color: var(--brand-green);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       Layout: Sticky Header, Sidebar TOC & Main Content
+       ========================================================================== */
+    .manual-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      background-color: var(--bg-glass);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      filter: drop-shadow(0 2px 8px var(--brand-green-glow));
+    }
+
+    .brand-text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      background: var(--brand-green-glow);
+      color: var(--brand-green);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-accent);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--brand-green);
+      color: #061a14;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-green-hover);
+      box-shadow: 0 4px 16px var(--brand-green-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--brand-green);
+      color: var(--brand-green);
+      background: var(--bg-card-hover);
+    }
+
+    /* Container */
+    .manual-layout {
+      display: flex;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       Sidebar Table of Contents (TOC)
+       ========================================================================== */
+    .manual-sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      padding: 28px 18px 40px 0;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .toc-search-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .toc-search-input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+
+    .toc-search-input:focus {
+      outline: none;
+      border-color: var(--brand-green);
+      box-shadow: 0 0 0 3px var(--brand-green-glow);
+    }
+
+    .toc-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .toc-group-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin: 18px 0 8px 10px;
+    }
+
+    .toc-nav {
+      list-style: none;
+    }
+
+    .toc-item {
+      margin-bottom: 3px;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: var(--transition);
+      border-left: 2px solid transparent;
+    }
+
+    .toc-link:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    .toc-link.active {
+      background: var(--brand-green-glow);
+      color: var(--brand-green);
+      font-weight: 600;
+      border-left: 2px solid var(--brand-green);
+    }
+
+    /* ==========================================================================
+       Main Manual Content
+       ========================================================================== */
+    .manual-content {
+      flex: 1;
+      min-width: 0;
+      padding: 36px 36px 80px 48px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%), var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, var(--brand-green-glow) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: 2.3rem;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #f8fafc 40%, var(--brand-green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin-bottom: 24px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .badge-pill.green {
+      border-color: var(--border-accent);
+      color: var(--brand-green);
+    }
+
+    .badge-pill.blue {
+      border-color: rgba(6, 182, 212, 0.4);
+      color: var(--brand-cyan);
+    }
+
+    /* Section Styling */
+    .manual-section {
+      margin-bottom: 60px;
+      scroll-margin-top: 90px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--brand-green-glow);
+      color: var(--brand-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 1.65rem;
+    }
+
+    .section-lead {
+      font-size: 1.02rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin: 28px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+    }
+
+    strong {
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       Media & Screenshot Figures with Zoom / Hover
+       ========================================================================== */
+    .figure-card {
+      margin: 24px 0 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+    }
+
+    .figure-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    .figure-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+      cursor: zoom-in;
+    }
+
+    .figure-caption {
+      padding: 12px 18px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .figure-caption svg {
+      color: var(--brand-green);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       Tables & Cards
+       ========================================================================== */
+    .table-wrap {
+      margin: 20px 0 28px;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .btn-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .btn-tag.danger {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: var(--brand-red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .btn-tag.success {
+      border-color: rgba(16, 185, 129, 0.4);
+      color: var(--brand-green);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Grid of Feature Cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin: 24px 0;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .feature-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--brand-green-glow);
+      color: var(--brand-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .feature-card h4 {
+      font-size: 1.05rem;
+    }
+
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ==========================================================================
+       Callout Alert Boxes (Note, Warning, Tip, Important)
+       ========================================================================== */
+    .callout {
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin: 20px 0 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      border-left: 4px solid;
+      background: var(--bg-surface);
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      margin-top: 2px;
+    }
+
+    .callout-content {
+      flex: 1;
+      font-size: 0.92rem;
+    }
+
+    .callout-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .callout.tip {
+      border-color: var(--brand-green);
+      background: rgba(16, 185, 129, 0.08);
+      color: var(--text-primary);
+    }
+    .callout.tip .callout-icon { color: var(--brand-green); }
+    .callout.tip .callout-title { color: var(--brand-green); }
+
+    .callout.important {
+      border-color: var(--brand-cyan);
+      background: rgba(6, 182, 212, 0.08);
+      color: var(--text-primary);
+    }
+    .callout.important .callout-icon { color: var(--brand-cyan); }
+    .callout.important .callout-title { color: var(--brand-cyan); }
+
+    .callout.warning {
+      border-color: var(--brand-amber);
+      background: rgba(245, 158, 11, 0.08);
+      color: var(--text-primary);
+    }
+    .callout.warning .callout-icon { color: var(--brand-amber); }
+    .callout.warning .callout-title { color: var(--brand-amber); }
+
+    .callout.danger {
+      border-color: var(--brand-red);
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--text-primary);
+    }
+    .callout.danger .callout-icon { color: var(--brand-red); }
+    .callout.danger .callout-title { color: var(--brand-red); }
+
+    /* Lists */
+    ul.check-list, ol.step-list {
+      margin: 16px 0 24px 20px;
+      color: var(--text-secondary);
+    }
+
+    ul.check-list li, ol.step-list li {
+      margin-bottom: 10px;
+      padding-left: 6px;
+    }
+
+    ul.check-list li::marker {
+      color: var(--brand-green);
+    }
+
+    ol.step-list li::marker {
+      color: var(--brand-green);
+      font-weight: 700;
+    }
+
+    /* Modal / Lightbox for Images */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      cursor: zoom-out;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-img {
+      max-width: 95vw;
+      max-height: 90vh;
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      object-fit: contain;
+    }
+
+    /* Footer */
+    .manual-footer {
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 80px;
+      padding-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .manual-sidebar {
+        display: none;
+      }
+      .manual-content {
+        padding: 24px 10px 60px;
+      }
+      .hero-title {
+        font-size: 1.85rem;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .manual-header, .manual-sidebar, .header-controls, .lightbox-modal {
+        display: none !important;
+      }
+      .manual-content {
+        padding: 0 !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .figure-card, .table-wrap, .feature-card, .callout {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+      a {
+        color: #000 !important;
+        text-decoration: underline;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Manual Sticky Header
+       ========================================================================== -->
+  <header class="manual-header">
+    <a href="index.html" class="brand-wrap" title="Ir a la aplicación LICBook">
+      <img src="assets/logo.png" alt="LICBook Logo" class="brand-logo">
+      <div class="brand-text">
+        <h1>LICBook <span class="brand-badge">Manual Oficial</span></h1>
+      </div>
+    </a>
+
+    <div class="header-controls">
+      <button type="button" class="btn btn-outline" id="btn-toggle-theme" title="Alternar tema claro/oscuro del manual">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+        <span id="theme-mode-label">Modo Claro</span>
+      </button>
+
+      <button type="button" class="btn btn-outline" onclick="window.print()" title="Imprimir o guardar como PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Imprimir / PDF</span>
+      </button>
+
+      <a href="index.html" class="btn btn-primary" title="Abrir la aplicación principal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        <span>Abrir LICBook</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Main Layout with Sidebar TOC and Documentation
+       ========================================================================== */ -->
+  <div class="manual-layout">
+    
+    <!-- Left Navigation Table of Contents -->
+    <aside class="manual-sidebar">
+      <div class="toc-search-box">
+        <svg class="toc-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="toc-filter" class="toc-search-input" placeholder="Filtrar temas del manual..." autocomplete="off">
+      </div>
+
+      <div class="toc-group-title">Guía de Inicio</div>
+      <ul class="toc-nav">
+        <li class="toc-item"><a href="#intro" class="toc-link active">1. Introducción y Filosofía</a></li>
+        <li class="toc-item"><a href="#compatibilidad" class="toc-link">2. Compatibilidad y Repositorio</a></li>
+      </ul>
+
+      <div class="toc-group-title">Módulos y Botones</div>
+      <ul class="toc-nav">
+        <li class="toc-item"><a href="#header-busqueda" class="toc-link">3. Barra Superior y Búsqueda</a></li>
+        <li class="toc-item"><a href="#sidebar-storage" class="toc-link">4. Barra Lateral y Almacenamiento</a></li>
+        <li class="toc-item"><a href="#catalogo-libros" class="toc-link">5. Catálogo, Filtros y Tarjetas</a></li>
+        <li class="toc-item"><a href="#modal-eliminar" class="toc-link">6. Modal Confirmar Eliminación</a></li>
+        <li class="toc-item"><a href="#mini-player" class="toc-link">7. Mini-Reproductor Persistente</a></li>
+      </ul>
+
+      <div class="toc-group-title">Lector y Libreta</div>
+      <ul class="toc-nav">
+        <li class="toc-item"><a href="#lector-modos" class="toc-link">8. Lector y los 3 Modos (3D)</a></li>
+        <li class="toc-item"><a href="#lector-herramientas" class="toc-link">9. Herramientas del Lector</a></li>
+        <li class="toc-item"><a href="#libreta-markdown" class="toc-link">10. Libreta de Apuntes Markdown</a></li>
+      </ul>
+
+      <div class="toc-group-title">Personalización y Ayuda</div>
+      <ul class="toc-nav">
+        <li class="toc-item"><a href="#temas-color" class="toc-link">11. Los 8 Temas de Color</a></li>
+        <li class="toc-item"><a href="#tour-guiado" class="toc-link">12. Recorrido Guiado (Tour)</a></li>
+        <li class="toc-item"><a href="#atajos-teclado" class="toc-link">13. Atajos de Teclado</a></li>
+        <li class="toc-item"><a href="#faq" class="toc-link">14. Preguntas Frecuentes</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="manual-content">
+
+      <!-- Hero Banner -->
+      <section class="hero-banner">
+        <h1 class="hero-title">Manual de Usuario de LICBook</h1>
+        <p class="hero-desc">
+          Guía exhaustiva de referencia técnica y funcional. Aprende a dominar cada botón, configurar tu repositorio en local, utilizar los modos de lectura continuo, paginado y libro 3D, y tomar apuntes interactivos en formato Markdown estilo Obsidian.
+        </p>
+        <div class="hero-badges">
+          <span class="badge-pill green">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Arquitectura 100% Local-First
+          </span>
+          <span class="badge-pill green">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            PDF & ePub con Efecto 3D
+          </span>
+          <span class="badge-pill blue">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Libreta Markdown Integrada
+          </span>
+          <span class="badge-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Versión 3.8
+          </span>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           1. INTRODUCCIÓN Y FILOSOFÍA LOCAL-FIRST
+           ========================================================================== -->
+      <section id="intro" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🛡️</div>
+          <h2>1. Introducción y Filosofía Local-First</h2>
+        </div>
+        <p class="section-lead">
+          LICBook fue concebido bajo el paradigma <strong>Local-First</strong> (lo local es lo primero). A diferencia de los lectores y servicios en la nube tradicionales, LICBook te otorga la soberanía absoluta de tus libros y apuntes.
+        </p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">🔒</div>
+              <h4>Privacidad Absoluta</h4>
+            </div>
+            <p>Tus libros, portadas, notas personales y marcadores jamás se transmiten a servidores externos ni requieren registrar una cuenta.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">⚡</div>
+              <h4>Funcionamiento Offline</h4>
+            </div>
+            <p>La aplicación está empaquetada con todos sus motores (PDF.js, ePub.js, JSZip) en local. Puedes leer en aviones o sin conexión a internet.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">📁</div>
+              <h4>Tus Archivos en tu Disco</h4>
+            </div>
+            <p>Conectas directamente tu carpeta del disco duro mediante la API de acceso al sistema de archivos del navegador moderno.</p>
+          </div>
+        </div>
+
+        <div class="figure-card">
+          <img src="assets/manual/biblioteca-principal.png" alt="Pantalla principal de la biblioteca LICBook" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 1.1:</strong> Vista general de la biblioteca digital: barra superior con búsqueda instantánea, barra lateral de navegación y estantería de libros.
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           2. COMPATIBILIDAD Y REPOSITORIO (CRÍTICO: CARGAR JSON Y EXPORTAR)
+           ========================================================================== -->
+      <section id="compatibilidad" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🌐</div>
+          <h2>2. Arquitectura de Almacenamiento y Compatibilidad de Navegadores</h2>
+        </div>
+        <p class="section-lead">
+          Para aprovechar al máximo LICBook, es fundamental comprender cómo interactúa con el sistema de archivos del navegador y en qué situaciones deben utilizarse los botones <strong>Vincular Carpeta</strong>, <strong>Cargar JSON</strong> y <strong>Exportar</strong>.
+        </p>
+
+        <h3>2.1 Mecanismos de Persistencia</h3>
+        <p>LICBook implementa una arquitectura híbrida de doble capa:</p>
+        <ol class="step-list">
+          <li><strong>Capa de Base de Datos Local (IndexedDB):</strong> Almacena al instante los metadatos de los libros, páginas leídas, marcapáginas, portadas personalizadas y la libreta de apuntes Markdown. Es compatible con el 100% de los navegadores modernos.</li>
+          <li><strong>Capa de Enlace con Disco (File System Access API):</strong> Permite seleccionar una carpeta física (por ejemplo, <code>Mis Libros</code>) para que LICBook lea directamente los archivos PDF y EPUB sin duplicar el peso en el almacenamiento interno del navegador.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h20.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </div>
+          <div class="callout-content">
+            <div class="callout-title">Importante: ¿Por qué ciertos navegadores no soportan "Vincular Carpeta"?</div>
+            <p>La <em>File System Access API</em> (método <code>showDirectoryPicker</code>) es un estándar respaldado por navegadores con motor Chromium (Google Chrome, Microsoft Edge, Opera, Brave). Navegadores como <strong>Mozilla Firefox</strong> y <strong>Apple Safari (macOS / iOS)</strong> han restringido esta API por políticas internas de privacidad y espacio aislado (sandbox).</p>
+          </div>
+        </div>
+
+        <h3>2.2 Matriz de Compatibilidad y Función de los Botones</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Navegador / Plataforma</th>
+                <th>Vincular Carpeta</th>
+                <th>+ Agregar Libro</th>
+                <th>Exportar (Backup)</th>
+                <th>Cargar JSON (Restore)</th>
+                <th>Solución Recomendada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Google Chrome</strong> (Win / Mac / Linux / ChromeOS)</td>
+                <td><span class="btn-tag success">Nativo</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Vincular carpeta directa o agregar libros manuales.</td>
+              </tr>
+              <tr>
+                <td><strong>Microsoft Edge</strong> (Win / Mac)</td>
+                <td><span class="btn-tag success">Nativo</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Experiencia nativa completa.</td>
+              </tr>
+              <tr>
+                <td><strong>Brave / Opera / Vivaldi</strong></td>
+                <td><span class="btn-tag success">Nativo</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Requiere conceder permiso al selector de carpetas.</td>
+              </tr>
+              <tr>
+                <td><strong>Mozilla Firefox</strong> (Desktop)</td>
+                <td><span class="btn-tag danger">No disponible</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Usa <strong>+ Agregar Libro</strong> para añadir archivos y <strong>Exportar / Cargar JSON</strong> para respaldos.</td>
+              </tr>
+              <tr>
+                <td><strong>Apple Safari</strong> (macOS / iPadOS / iOS)</td>
+                <td><span class="btn-tag danger">No disponible</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Añade libros con el botón superior y utiliza <strong>Cargar JSON</strong> para importar tu biblioteca desde la PC.</td>
+              </tr>
+              <tr>
+                <td><strong>Navegadores Móviles</strong> (Android / iPhone)</td>
+                <td><span class="btn-tag danger">No disponible</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td><span class="btn-tag success">Soportado</span></td>
+                <td>Ideal para sincronizar mediante archivo JSON respaldado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>2.3 ¿En qué casos usar exactamente "Cargar JSON" y "Exportar"?</h3>
+        <ul class="check-list">
+          <li><strong>Caso 1: Respaldo de seguridad periódico:</strong> Pulsa <span class="btn-tag">Exportar</span> antes de limpiar cookies, historial o caché del navegador. Esto descarga un archivo <code>licbook_backup.json</code> con tus libros, portadas, notas en Markdown y avance exacto de lectura.</li>
+          <li><strong>Caso 2: Migración entre diferentes navegadores:</strong> Si organizas tu biblioteca en Google Chrome y deseas leer en Firefox o Safari, pulsa <strong>Exportar</strong> en Chrome y luego <strong>Cargar JSON</strong> en Firefox o Safari. Todos tus datos se reconstruirán automáticamente.</li>
+          <li><strong>Caso 3: Trabajo en navegadores sin soporte de carpetas:</strong> En Firefox, Safari o móviles, añade tus libros individualmente con <code>+ Agregar Libro</code> y guarda tus progresos mediante <strong>Exportar</strong>.</li>
+          <li><strong>Caso 4: Compartir notas o estanterías:</strong> Puedes transferir el archivo JSON generado a otro equipo para continuar exactamente donde lo dejaste.</li>
+        </ul>
+      </section>
+
+      <!-- ==========================================================================
+           3. BARRA SUPERIOR Y BÚSQUEDA GLOBAL
+           ========================================================================== -->
+      <section id="header-busqueda" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🔍</div>
+          <h2>3. Barra Superior y Búsqueda Global</h2>
+        </div>
+        <p class="section-lead">
+          La barra superior está fijada permanentemente y proporciona acceso a la búsqueda instantánea y a las funciones de personalización y alta de libros.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Elemento / Botón</th>
+                <th>Icono / Aspecto</th>
+                <th>Acción y Función Detallada</th>
+                <th>Atajo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Logotipo y Título</strong></td>
+                <td><span class="btn-tag">LICBook Logo</span></td>
+                <td>Recarga la vista principal y restablece los filtros al estado inicial.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Campo de Búsqueda</strong></td>
+                <td><code>Buscar por título...</code></td>
+                <td>Filtro dinámico en tiempo real. Busca por título, autor, editorial, año de publicación o género sin recargar la página.</td>
+                <td>Clic en barra</td>
+              </tr>
+              <tr>
+                <td><strong>Limpiar Búsqueda</strong></td>
+                <td><span class="btn-tag">✕</span></td>
+                <td>Aparece cuando hay texto ingresado en la búsqueda. Borra el término y restaura el catálogo completo.</td>
+                <td><kbd>Esc</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Recorrido Guiado</strong></td>
+                <td><span class="btn-tag">?</span></td>
+                <td>Inicia el tour interactivo paso a paso de 6 fases para usuarios nuevos o para repasar controles clave.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Personalizar Tema</strong></td>
+                <td><span class="btn-tag">◐</span></td>
+                <td>Despliega la ventana modal con la galería de los 8 temas de color exclusivos de LICBook.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>+ Agregar Libro</strong></td>
+                <td><span class="btn-tag success">+ Agregar Libro</span></td>
+                <td>Abre el modal para importar un archivo PDF o EPUB al catálogo, asignar portada y rellenar sus metadatos.</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           4. BARRA LATERAL Y ALMACENAMIENTO
+           ========================================================================== -->
+      <section id="sidebar-storage" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">📂</div>
+          <h2>4. Barra Lateral y Repositorio Local</h2>
+        </div>
+        <p class="section-lead">
+          La barra lateral izquierda organiza tus colecciones de lectura y gestiona la vinculación física con el disco duro.
+        </p>
+
+        <h3>4.1 Pestañas de Navegación</h3>
+        <ul class="check-list">
+          <li><strong>Biblioteca:</strong> Muestra la totalidad de obras registradas en el catálogo.</li>
+          <li><strong>En Lectura:</strong> Filtra únicamente aquellos libros cuyo porcentaje de avance se encuentra entre el 1% y el 99%.</li>
+          <li><strong>Favoritos:</strong> Muestra los libros que has marcado con la estrella dorada de preferencia.</li>
+        </ul>
+
+        <h3>4.2 Botones de Repositorio Local</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Botón</th>
+                <th>Texto e Icono</th>
+                <th>Comportamiento y Reglas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Vincular Carpeta / Sincronizar</strong></td>
+                <td><span class="btn-tag success">📁 Vincular Carpeta</span></td>
+                <td>Abre el selector de carpetas del sistema operativo (en Chrome, Edge, Brave, Opera). Escanea automáticamente archivos <code>.pdf</code> y <code>.epub</code> para incorporarlos a la estantería.</td>
+              </tr>
+              <tr>
+                <td><strong>Desvincular</strong></td>
+                <td><span class="btn-tag danger">⏻ Desvincular</span></td>
+                <td>Desvincula la carpeta del sistema de archivos local y limpia los identificadores del navegador, manteniendo tus archivos intactos en tu disco duro.</td>
+              </tr>
+              <tr>
+                <td><strong>Cargar JSON</strong></td>
+                <td><span class="btn-tag">⬆ Cargar JSON</span></td>
+                <td>Abre un selector de archivo para leer una copia de seguridad <code>.json</code> y restaurar la biblioteca completa en IndexedDB. Es la solución para Firefox, Safari y móviles.</td>
+              </tr>
+              <tr>
+                <td><strong>Exportar</strong></td>
+                <td><span class="btn-tag">⬇ Exportar</span></td>
+                <td>Genera y descarga al instante un archivo JSON con toda la base de datos de libros, notas y avances. Funciona en el 100% de plataformas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           5. CATÁLOGO, FILTROS Y TARJETAS DE LIBROS
+           ========================================================================== -->
+      <section id="catalogo-libros" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">📚</div>
+          <h2>5. Catálogo de Libros, Filtros y Opciones</h2>
+        </div>
+        <p class="section-lead">
+          Visualiza tu colección mediante portadas de alta calidad gráfica o mediante una lista compacta para administración rápida.
+        </p>
+
+        <h3>5.1 Píldoras de Filtro y Selectores</h3>
+        <ul class="check-list">
+          <li><strong>Todos los Libros:</strong> Desactiva cualquier filtro de estado y muestra la colección entera.</li>
+          <li><strong>Leyendo Actualmente:</strong> Filtra libros con lectura iniciada.</li>
+          <li><strong>Favoritos:</strong> Obras marcadas con estrella.</li>
+          <li><strong>Leídos:</strong> Obras con el 100% de progreso completado.</li>
+          <li><strong>Desplegable "Todos los Géneros":</strong> Filtra por categorías (p. ej., <em>Novela Clásica</em>, <em>Realismo Mágico</em>, <em>Tecnología</em>).</li>
+          <li><strong>Desplegable "Todas las Editoriales":</strong> Agrupa por casa editorial.</li>
+          <li><strong>Alternador de Vistas:</strong>
+            <ul>
+              <li>Botón <span class="btn-tag">⊞</span> (Cuadrícula): Estantería visual con portadas y lomo tridimensional.</li>
+              <li>Botón <span class="btn-tag">☰</span> (Lista): Tabla compacta con columnas de título, autor, editorial, género y barra de progreso.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3>5.2 Interacción con la Tarjeta de Libro</h3>
+        <p>Cada tarjeta cuenta con controles directos:</p>
+        <ul class="check-list">
+          <li><strong>Clic en la portada o título:</strong> Abre de inmediato el libro en el Lector Avanzado en la última página leída.</li>
+          <li><strong>Estrella dorada:</strong> Alterna rápidamente el estado de favorito.</li>
+          <li><strong>Botón de tres puntos (<kbd>⋮</kbd>):</strong> Despliega el menú contextual con las siguientes acciones:
+            <ul>
+              <li><strong>Editar:</strong> Abre el formulario modal para corregir título, autor, portada personalizada, editorial o sinopsis.</li>
+              <li><strong>Marcar como Favorito / Quitar:</strong> Alterna el distintivo de preferencia.</li>
+              <li><strong>Eliminar:</strong> Solicita confirmación para remover el libro de la biblioteca.</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ==========================================================================
+           6. VENTANA MODAL PARA ELIMINAR LIBROS
+           ========================================================================== -->
+      <section id="modal-eliminar" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🗑️</div>
+          <h2>6. Ventana Modal de Confirmación para Eliminar Libro</h2>
+        </div>
+        <p class="section-lead">
+          Para evitar pérdidas accidentales y cumplir con estándares de interfaz moderna, LICBook reemplaza los mensajes predeterminados del navegador con una ventana modal de confirmación de alta fidelidad visual.
+        </p>
+
+        <div class="figure-card">
+          <img src="assets/manual/modal-eliminar.png" alt="Modal de confirmación para eliminar libro" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 6.1:</strong> Modal estilizado con advertencia clara, indicando el título de la obra que se desea eliminar.
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Botón del Modal</th>
+                <th>Estilo Visual</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cancelar</strong></td>
+                <td><span class="btn-tag">Cancelar</span></td>
+                <td>Cierra la ventana modal sin efectuar ningún cambio en la biblioteca ni en los archivos del disco.</td>
+              </tr>
+              <tr>
+                <td><strong>Eliminar</strong></td>
+                <td><span class="btn-tag danger">Eliminar</span></td>
+                <td>Elimina el registro del libro, sus notas asociadas y su portada de IndexedDB de manera definitiva.</td>
+              </tr>
+              <tr>
+                <td><strong>Cerrar (✕) o Tecla Esc</strong></td>
+                <td><span class="btn-tag">✕</span></td>
+                <td>Equivale a cancelar la operación y regresa al catálogo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           7. MINI-REPRODUCTOR INFERIOR PERSISTENTE (SPOTIFY STYLE)
+           ========================================================================== -->
+      <section id="mini-player" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🎵</div>
+          <h2>7. Mini-Reproductor Inferior Persistente</h2>
+        </div>
+        <p class="section-lead">
+          Inspirado en la ergonomía de reproductores como Spotify, la barra inferior permite retomar lecturas activas en cualquier momento con un solo clic.
+        </p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <h4>Miniatura y Datos de la Obra</h4>
+            <p>Muestra la portada miniatura, el título y el autor del libro en curso o leído más recientemente.</p>
+          </div>
+          <div class="feature-card">
+            <h4>Botón Continuar Lectura (<kbd>▶</kbd>)</h4>
+            <p>Abre el libro instantáneamente y te sitúa exactamente en la página o párrafo donde interrumpiste la sesión.</p>
+          </div>
+          <div class="feature-card">
+            <h4>Barra y Porcentaje de Avance</h4>
+            <p>Indicador visual del progreso (ej. <code>25% leído</code>) junto con el número de página actual sobre el total.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           8. LECTOR Y LOS 3 MODOS DE LECTURA (INCLUYE EFECTO 3D)
+           ========================================================================== -->
+      <section id="lector-modos" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">📖</div>
+          <h2>8. Lector Avanzado y los 3 Modos de Visualización</h2>
+        </div>
+        <p class="section-lead">
+          El lector integrado ofrece tres modos ergonómicos de visualización adaptables a cualquier tipo de libro o preferencia personal.
+        </p>
+
+        <div class="figure-card">
+          <img src="assets/manual/lector-indice.png" alt="Lector avanzado con índice de capítulos desplegado" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 8.1:</strong> Lector de libros con barra de navegación superior, índice flotante de contenidos y paginador inferior.
+          </div>
+        </div>
+
+        <h3>Los 3 Modos de Lectura</h3>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">📜</div>
+              <h4>1. Desplazamiento Vertical</h4>
+            </div>
+            <p>Páginas continuas en scroll fluido. Es el modo más ágil para documentos técnicos, textos con diagramas o lectura en monitores ultra-anchos.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">📄</div>
+              <h4>2. Paginación Horizontal</h4>
+            </div>
+            <p>Pasa páginas una a una de izquierda a derecha sin desplazamiento vertical, manteniendo la vista fija en la caja de texto.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-title">
+              <div class="feature-icon">✨</div>
+              <h4>3. Efecto Libro 3D</h4>
+            </div>
+            <p>Simula un libro físico impreso con perspectiva tridimensional, curvatura en el pliegue central y animación realista al pasar la página.</p>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4m0-4h.01"></path></svg>
+          </div>
+          <div class="callout-content">
+            <div class="callout-title">Consejo de lectura</div>
+            <p>Puedes alternar entre los tres modos en cualquier momento haciendo clic en el botón central de la barra superior del lector: <strong>Desplazamiento Vertical / Paginación Horizontal / Efecto 3D</strong>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           9. HERRAMIENTAS DEL LECTOR
+           ========================================================================== -->
+      <section id="lector-herramientas" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🛠️</div>
+          <h2>9. Herramientas y Controles del Lector</h2>
+        </div>
+        <p class="section-lead">
+          Controla la tipografía, búsqueda, marcapáginas y zoom mediante la barra de herramientas superior e inferior.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Botón / Control</th>
+                <th>Icono</th>
+                <th>Función y Comportamiento</th>
+                <th>Atajo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Volver a Biblioteca</strong></td>
+                <td><span class="btn-tag">←</span></td>
+                <td>Guarda el progreso actual y regresa a la estantería general.</td>
+                <td><kbd>Esc</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Búsqueda Interna</strong></td>
+                <td><span class="btn-tag">🔍</span></td>
+                <td>Despliega la barra de búsqueda de texto dentro del libro (PDF o EPUB), con navegación de coincidencias anterior/siguiente.</td>
+                <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Marcapáginas</strong></td>
+                <td><span class="btn-tag">🔖</span></td>
+                <td>Guarda la página actual en la pestaña de marcapáginas para consultarla rápidamente más tarde.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Zoom (- / +)</strong></td>
+                <td><span class="btn-tag">🔍- / 🔍+</span></td>
+                <td>Aumenta o reduce el tamaño de escala del documento para mejorar la legibilidad.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Tema de Lectura</strong></td>
+                <td><span class="btn-tag">🌙</span></td>
+                <td>Alterna entre tema de lectura Claro (fondo blanco clásico) y Nocturno (alto contraste oscuro que descansa la vista).</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Pantalla Completa</strong></td>
+                <td><span class="btn-tag">⛶</span></td>
+                <td>Maximiza el visor eliminando barras del navegador para una experiencia 100% inmersiva.</td>
+                <td><kbd>F11</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Botón Flotante Índice (Izquierda)</strong></td>
+                <td><span class="btn-tag">☰</span></td>
+                <td>Despliega el menú con dos pestañas: <strong>Índice</strong> de capítulos y <strong>Marcapáginas</strong> guardados.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Pestaña Libreta (Derecha)</strong></td>
+                <td><span class="btn-tag">📝 LIBRETA</span></td>
+                <td>Abre el cajón lateral con el bloc de notas Markdown vinculado al libro actual.</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Paginador Inferior</strong></td>
+                <td><span class="btn-tag">‹ [5 / 24] ›</span></td>
+                <td>Contiene botones de página anterior/siguiente, barra deslizadora de arrastre (slider) y caja numérica para saltar a una página específica.</td>
+                <td><kbd>←</kbd> / <kbd>→</kbd></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           10. LIBRETA DE APUNTES INTEGRADA (ESTILO OBSIDIAN)
+           ========================================================================== -->
+      <section id="libreta-markdown" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">📝</div>
+          <h2>10. Libreta de Apuntes Integrada (Estilo Obsidian / Markdown)</h2>
+        </div>
+        <p class="section-lead">
+          Toma apuntes mientras lees sin necesidad de salir de la aplicación. Las notas se sincronizan automáticamente con cada libro y soportan sintaxis rica en formato Markdown.
+        </p>
+
+        <div class="figure-card">
+          <img src="assets/manual/lector-libreta.png" alt="Libreta de apuntes Markdown estilo Obsidian con botones Descargar y Anexar texto" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 10.1:</strong> Libreta lateral con barra de herramientas de formato, indicador de guardado automático, botones <em>Descargar</em> y <em>Anexar texto</em>.
+          </div>
+        </div>
+
+        <h3>10.1 Botones de Acción de la Libreta</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Botón</th>
+                <th>Texto</th>
+                <th>Acción Detallada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Descargar</strong></td>
+                <td><span class="btn-tag">⬇ Descargar</span></td>
+                <td>Descarga inmediatamente un archivo <code>.md</code> con todas tus notas formateadas para abrirlas en Obsidian, Logseq, Notion o VS Code.</td>
+              </tr>
+              <tr>
+                <td><strong>Anexar texto</strong></td>
+                <td><span class="btn-tag">📎 Anexar texto</span></td>
+                <td>Abre el selector de archivos para adjuntar el contenido de cualquier archivo <code>.txt</code> o <code>.md</code> externo directamente al final de tus apuntes actuales.</td>
+              </tr>
+              <tr>
+                <td><strong>Pestaña "Editar"</strong></td>
+                <td><span class="btn-tag">✏ Editar</span></td>
+                <td>Activa el editor de texto plano con soporte completo de atajos Markdown y autoguardado.</td>
+              </tr>
+              <tr>
+                <td><strong>Pestaña "Previa"</strong></td>
+                <td><span class="btn-tag">👁 Previa</span></td>
+                <td>Renderiza en tiempo real el texto como documento tipográfico limpio (encabezados, resaltados, listas interactivas de tareas y citas).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>10.2 Barra de Herramientas de Formato Markdown</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Herramienta</th>
+                <th>Botón</th>
+                <th>Sintaxis Generada</th>
+                <th>Resultado Visual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Encabezado 1</strong></td>
+                <td><span class="btn-tag">H1</span></td>
+                <td><code># Título Principal</code></td>
+                <td>Encabezado de primer nivel grande</td>
+              </tr>
+              <tr>
+                <td><strong>Encabezado 2</strong></td>
+                <td><span class="btn-tag">H2</span></td>
+                <td><code>## Subtítulo</code></td>
+                <td>Subtítulo de segundo nivel</td>
+              </tr>
+              <tr>
+                <td><strong>Encabezado 3</strong></td>
+                <td><span class="btn-tag">H3</span></td>
+                <td><code>### Sección</code></td>
+                <td>Sección de tercer nivel</td>
+              </tr>
+              <tr>
+                <td><strong>Negrita</strong></td>
+                <td><span class="btn-tag">B</span></td>
+                <td><code>**texto en negrita**</code></td>
+                <td><strong>texto en negrita</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Cursiva</strong></td>
+                <td><span class="btn-tag">I</span></td>
+                <td><code>*texto en cursiva*</code></td>
+                <td><em>texto en cursiva</em></td>
+              </tr>
+              <tr>
+                <td><strong>Tachado</strong></td>
+                <td><span class="btn-tag">S</span></td>
+                <td><code>~~texto tachado~~</code></td>
+                <td><s>texto tachado</s></td>
+              </tr>
+              <tr>
+                <td><strong>Resaltado Obsidian</strong></td>
+                <td><span class="btn-tag success">==</span></td>
+                <td><code>==texto resaltado==</code></td>
+                <td>Texto con fondo fluorescente estilo marcador</td>
+              </tr>
+              <tr>
+                <td><strong>Cita</strong></td>
+                <td><span class="btn-tag">"</span></td>
+                <td><code>> Frase célebre o extracto</code></td>
+                <td>Bloque de cita indentado con barra vertical</td>
+              </tr>
+              <tr>
+                <td><strong>Lista con viñetas</strong></td>
+                <td><span class="btn-tag">•</span></td>
+                <td><code>- Elemento de lista</code></td>
+                <td>Viñeta circular ordenada</td>
+              </tr>
+              <tr>
+                <td><strong>Lista de tareas</strong></td>
+                <td><span class="btn-tag">[ ]</span></td>
+                <td><code>- [ ] Tarea pendiente</code></td>
+                <td>Casilla de verificación interactiva (Checklist)</td>
+              </tr>
+              <tr>
+                <td><strong>Bloque de código</strong></td>
+                <td><span class="btn-tag">&lt;&gt;</span></td>
+                <td><code>`código en línea`</code></td>
+                <td>Tipografía monoespaciada con fondo sutil</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           11. LOS 8 TEMAS DE COLOR EXCLUSIVOS
+           ========================================================================== -->
+      <section id="temas-color" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🎨</div>
+          <h2>11. Personalización: Los 8 Temas de Color</h2>
+        </div>
+        <p class="section-lead">
+          LICBook incluye un motor de diseño armónico que recalcula contrastes, bordes, brillos y tipografías en toda la aplicación.
+        </p>
+
+        <div class="figure-card">
+          <img src="assets/manual/tema-lemon.png" alt="Selector de temas de color en LICBook" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 11.1:</strong> Galería de temas accesible mediante el botón de luna/sol en el encabezado.
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre del Tema</th>
+                <th>Tipo</th>
+                <th>Paleta y Atmósfera</th>
+                <th>Ideal para</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cyber Emerald</strong></td>
+                <td>Oscuro</td>
+                <td>Fondo verde petróleo profundo con acentos en verde menta fluorescente.</td>
+                <td>Tema por defecto, moderno y energizante.</td>
+              </tr>
+              <tr>
+                <td><strong>Lemon Ice-Cream</strong></td>
+                <td>Claro Pastel</td>
+                <td>Fondo crema suave y vainilla con acentos en amarillo limón y menta fresca.</td>
+                <td>Ambientes luminosos con contraste suave.</td>
+              </tr>
+              <tr>
+                <td><strong>Obsidian Dark</strong></td>
+                <td>Oscuro Puro</td>
+                <td>Fondo negro obsidiana con acentos en azul índigo minimalista.</td>
+                <td>Concentración máxima y pantallas OLED.</td>
+              </tr>
+              <tr>
+                <td><strong>Iron-Man</strong></td>
+                <td>Oscuro Cálido</td>
+                <td>Armadura carmesí granate con acentos dorados y resplandor de reactor Arc.</td>
+                <td>Estética vibrante de alto impacto visual.</td>
+              </tr>
+              <tr>
+                <td><strong>Nordic Frost</strong></td>
+                <td>Oscuro Frío</td>
+                <td>Azul polar ártico profundo con acentos en cian glaciar.</td>
+                <td>Lectura serena y técnica.</td>
+              </tr>
+              <tr>
+                <td><strong>Sunset Amber</strong></td>
+                <td>Oscuro Cálido</td>
+                <td>Carbón tostado con acentos en naranja ámbar y fuego suave.</td>
+                <td>Lectura nocturna relajante.</td>
+              </tr>
+              <tr>
+                <td><strong>Clean Light</strong></td>
+                <td>Claro Puro</td>
+                <td>Blanco nieve con bordes en gris pizarra y acentos azul tecnológico.</td>
+                <td>Uso en oficinas o al aire libre.</td>
+              </tr>
+              <tr>
+                <td><strong>Dracula Classic</strong></td>
+                <td>Oscuro Gótico</td>
+                <td>Púrpura noche con acentos en rosa neón y cian vibrante.</td>
+                <td>Desarrolladores y amantes de la estética synthwave.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           12. RECORRIDO GUIADO (TOUR INTERACTIVO)
+           ========================================================================== -->
+      <section id="tour-guiado" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">🧭</div>
+          <h2>12. Recorrido Guiado Interactivo (Tour)</h2>
+        </div>
+        <p class="section-lead">
+          El asistente integrado orienta paso a paso a nuevos usuarios a través de los elementos neurálgicos de la aplicación.
+        </p>
+
+        <div class="figure-card">
+          <img src="assets/manual/tour-bienvenida.png" alt="Modal de bienvenida del recorrido guiado" onclick="openLightbox(this)">
+          <div class="figure-caption">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <strong>Figura 12.1:</strong> Invitación inicial al recorrido guiado interactivo para familiarizarse con LICBook.
+          </div>
+        </div>
+
+        <p>El recorrido consta de 6 pasos estratégicos con posicionamiento adaptativo garantizado:</p>
+        <ol class="step-list">
+          <li><strong>Paso 1 - Repositorio Local:</strong> Vinculación de carpetas de libros en disco.</li>
+          <li><strong>Paso 2 - Buscador Global:</strong> Búsqueda en tiempo real de títulos y autores.</li>
+          <li><strong>Paso 3 - Temas de Color:</strong> Personalización estética entre los 8 temas.</li>
+          <li><strong>Paso 4 - Agregar Libros:</strong> Carga manual de archivos y edición de metadatos.</li>
+          <li><strong>Paso 5 - Vistas Cuadrícula / Lista:</strong> Organización visual de la estantería.</li>
+          <li><strong>Paso 6 - Lector y Libreta:</strong> Apertura de obras, modos 3D y apuntes Obsidian.</li>
+        </ol>
+      </section>
+
+      <!-- ==========================================================================
+           13. TABLA DE ATAJOS DE TECLADO
+           ========================================================================== -->
+      <section id="atajos-teclado" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">⌨️</div>
+          <h2>13. Tabla Maestra de Atajos de Teclado</h2>
+        </div>
+        <p class="section-lead">
+          Aumenta tu velocidad de lectura y navegación utilizando las combinaciones de teclas admitidas en la aplicación.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Atajo</th>
+                <th>Contexto</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>F</kbd> / <kbd>Cmd</kbd> + <kbd>F</kbd></td>
+                <td>Lector Abierto</td>
+                <td>Abre o enfoca la barra de búsqueda de texto interna en el libro.</td>
+              </tr>
+              <tr>
+                <td><kbd>Esc</kbd></td>
+                <td>Global</td>
+                <td>Cierra modales, menús flotantes, cajón de notas o sale del tour guiado.</td>
+              </tr>
+              <tr>
+                <td><kbd>→</kbd> / <kbd>Espacio</kbd> / <kbd>AvPág</kbd></td>
+                <td>Lector Paginado / 3D</td>
+                <td>Avanza a la página siguiente.</td>
+              </tr>
+              <tr>
+                <td><kbd>←</kbd> / <kbd>RePág</kbd></td>
+                <td>Lector Paginado / 3D</td>
+                <td>Retrocede a la página anterior.</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>B</kbd></td>
+                <td>Libreta de Notas</td>
+                <td>Aplica formato negrita al texto seleccionado (<code>**texto**</code>).</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>I</kbd></td>
+                <td>Libreta de Notas</td>
+                <td>Aplica formato cursiva al texto seleccionado (<code>*texto*</code>).</td>
+              </tr>
+              <tr>
+                <td><kbd>Enter</kbd> o <kbd>→</kbd></td>
+                <td>Recorrido Guiado</td>
+                <td>Avanza al siguiente paso del tour.</td>
+              </tr>
+              <tr>
+                <td><kbd>←</kbd></td>
+                <td>Recorrido Guiado</td>
+                <td>Regresa al paso anterior del tour.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           14. PREGUNTAS FRECUENTES (FAQ)
+           ========================================================================== -->
+      <section id="faq" class="manual-section">
+        <div class="section-header">
+          <div class="section-icon">❓</div>
+          <h2>14. Preguntas Frecuentes (FAQ)</h2>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <h4>¿Dónde se guardan mis libros y notas?</h4>
+            <p>Se almacenan de manera local y encriptada en la base de datos IndexedDB de tu propio navegador. Ningún dato viaja a través de Internet.</p>
+          </div>
+
+          <div class="feature-card">
+            <h4>¿Qué ocurre si cambio de navegador?</h4>
+            <p>Usa el botón <strong>Exportar</strong> en tu navegador actual para descargar el archivo JSON, abre LICBook en tu nuevo navegador y presiona <strong>Cargar JSON</strong>.</p>
+          </div>
+
+          <div class="feature-card">
+            <h4>¿Qué formatos de archivo puedo leer?</h4>
+            <p>LICBook soporta de manera nativa archivos en formato <strong>PDF</strong> (estándar Adobe) y libros electrónicos <strong>EPUB</strong> (versiones 2 y 3).</p>
+          </div>
+
+          <div class="feature-card">
+            <h4>¿Puedo usar la aplicación sin servidor local?</h4>
+            <p>Para que los Web Workers de PDF y la lectura de EPUB funcionen sin restricciones de seguridad del navegador, se requiere ejecutar mediante un servidor HTTP local (como <code>python -m http.server</code>, Live Server o <code>npx serve</code>).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="manual-footer">
+        <div class="footer-left">
+          <img src="assets/logo.png" alt="LICBook" style="width: 24px; height: 24px;">
+          <span>LICBook © 2026 - Licencia de código abierto MIT</span>
+        </div>
+        <div class="footer-right">
+          <a href="index.html" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;">Volver a LICBook</a>
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- Lightbox Modal for Fullscreen Image Inspection -->
+  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
+    <img id="lightbox-img" class="lightbox-img" src="" alt="Ampliación">
+  </div>
+
+  <!-- ==========================================================================
+       Interactive Script for Manual: ScrollSpy, Search, Lightbox & Theme
+       ========================================================================== -->
+  <script>
+    // 1. Lightbox function
+    function openLightbox(imgEl) {
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      img.src = imgEl.src;
+      modal.classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // 2. Manual Theme Toggle (Light / Dark)
+    const btnToggleTheme = document.getElementById('btn-toggle-theme');
+    const themeLabel = document.getElementById('theme-mode-label');
+
+    btnToggleTheme.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-manual-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-manual-theme', next);
+      themeLabel.textContent = next === 'dark' ? 'Modo Claro' : 'Modo Oscuro';
+      try {
+        localStorage.setItem('licbook_manual_theme', next);
+      } catch (e) {}
+    });
+
+    // Load saved manual theme
+    try {
+      const saved = localStorage.getItem('licbook_manual_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-manual-theme', saved);
+        themeLabel.textContent = saved === 'dark' ? 'Modo Claro' : 'Modo Oscuro';
+      }
+    } catch (e) {}
+
+    // 3. ScrollSpy for TOC Links
+    const sections = document.querySelectorAll('.manual-section');
+    const navLinks = document.querySelectorAll('.toc-link');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const scrollY = window.pageYOffset;
+
+      sections.forEach(section => {
+        const top = section.offsetTop - 120;
+        const height = section.offsetHeight;
+        if (scrollY >= top && scrollY < top + height) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // 4. TOC Search / Filter
+    const filterInput = document.getElementById('toc-filter');
+    filterInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      navLinks.forEach(link => {
+        const text = link.textContent.toLowerCase();
+        const item = link.closest('.toc-item');
+        if (!query || text.includes(query)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
