@@ -73,9 +73,7 @@
    Paletas de Temas Globales de la Aplicación (8 Temas)
    ========================================================================== */
 
-/* 1. Cyber Emerald (Tema Predeterminado LICBook) */
-:root,
-html:not([data-app-theme]),
+/* 1. Cyber Emerald */
 html[data-app-theme="cyber-emerald"],
 html[data-app-theme="cyber-emerald"] body {
   --bg-app: #08110D;
@@ -219,7 +217,9 @@ html[data-app-theme="rose-quartz"] body {
   --brand-aqua: #F472B6;
 }
 
-/* 7. Lemon Ice-Cream (Vainilla cremosa con acento amarillo limón y menta) */
+/* 7. Lemon Ice-Cream (Tema Predeterminado LICBook - Vainilla cremosa con acento amarillo limón y menta) */
+:root,
+html:not([data-app-theme]),
 html[data-app-theme="lemon-icecream"],
 html[data-app-theme="lemon-icecream"] body {
   --bg-app: #FFFDF2;
@@ -4067,6 +4067,340 @@ html[data-app-theme="lemon-icecream"] .mini-player-bar {
 }
 
 /* ==========================================================================
+   Lemon Ice-Cream (Light Vanilla) Comprehensive High-Contrast Refinements
+   Ensures WCAG AA compliance (> 4.5:1) for text, buttons, active states,
+   badges, and markdown notes without affecting other themes.
+   ========================================================================== */
+
+/* 1. Sidebar Navigation: Active Item */
+html[data-app-theme="lemon-icecream"] .nav-item.active {
+  background-color: #FEF08A;
+  color: #3B2314;
+  font-weight: 700;
+  border-left: 3px solid #CA8A04;
+}
+html[data-app-theme="lemon-icecream"] .nav-item.active svg {
+  stroke: #3B2314;
+}
+
+/* 2. Sidebar Storage Actions: Vincular Carpeta & Sincronizar */
+html[data-app-theme="lemon-icecream"] .btn-storage-main {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.45);
+}
+html[data-app-theme="lemon-icecream"] .btn-storage-main:hover {
+  background-color: #FDE047;
+  color: #422006;
+  border-color: #CA8A04;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.28);
+}
+html[data-app-theme="lemon-icecream"] .btn-storage-main.is-connected {
+  background: rgba(5, 150, 105, 0.12);
+  border-color: rgba(5, 150, 105, 0.4);
+  color: #065F46;
+}
+html[data-app-theme="lemon-icecream"] .btn-storage-main.is-connected:hover {
+  background: #059669;
+  border-color: #047857;
+  color: #FFFFFF;
+}
+
+/* 3. Sidebar Storage: Cargar JSON & Exportar */
+html[data-app-theme="lemon-icecream"] .btn-storage-sync {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+}
+html[data-app-theme="lemon-icecream"] .btn-storage-sync:hover {
+  background-color: #FDE047;
+  color: #422006;
+  border-color: #CA8A04;
+}
+
+/* 4. Sidebar Storage: Desvincular */
+html[data-app-theme="lemon-icecream"] .btn-storage-purge {
+  background-color: rgba(225, 29, 72, 0.08);
+  border: 1px solid rgba(225, 29, 72, 0.28);
+  color: #BE123C;
+}
+html[data-app-theme="lemon-icecream"] .btn-storage-purge:hover {
+  background-color: #E11D48;
+  border-color: #BE123C;
+  color: #FFFFFF;
+}
+
+/* 5. View Mode Toggle (Grid / List) */
+html[data-app-theme="lemon-icecream"] .view-btn.active {
+  background-color: #FEF08A;
+  color: #3B2314;
+  border: 1px solid rgba(202, 138, 4, 0.35);
+}
+html[data-app-theme="lemon-icecream"] .view-btn.active svg {
+  stroke: #3B2314;
+}
+
+/* 6. Book Badges & Metadata Tags (Grid & List View) */
+html[data-app-theme="lemon-icecream"] .book-genre-tag,
+html[data-app-theme="lemon-icecream"] .books-list .book-genre-tag {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+}
+
+/* 7. Bottom Mini-Player: Page Tag ("Pág. X / Y") */
+html[data-app-theme="lemon-icecream"] .player-page-tag {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+}
+
+/* 8. Modal & Reader Dropdown / Badges */
+html[data-app-theme="lemon-icecream"] .btn-custom-cover {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+}
+html[data-app-theme="lemon-icecream"] .btn-custom-cover:hover {
+  background-color: #FDE047;
+  color: #422006;
+}
+html[data-app-theme="lemon-icecream"] .dropdown-item.active {
+  background-color: #FEF08A;
+  color: #3B2314;
+}
+html[data-app-theme="lemon-icecream"] .tab-badge,
+html[data-app-theme="lemon-icecream"] .search-result-badge {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.28);
+}
+html[data-app-theme="lemon-icecream"] .file-dropzone:hover,
+html[data-app-theme="lemon-icecream"] .file-dropzone.dragover {
+  border-color: #CA8A04;
+  background-color: #FEF08A;
+}
+html[data-app-theme="lemon-icecream"] .file-dropzone:hover .dropzone-icon,
+html[data-app-theme="lemon-icecream"] .file-dropzone.dragover .dropzone-icon {
+  color: #78350F;
+}
+
+/* 9. Reader Notes Drawer (Libreta de Apuntes) Styling & Contrast */
+html[data-app-theme="lemon-icecream"] .reader-notes-drawer {
+  background-color: #FFFDF2;
+  border-left: 1px solid rgba(202, 138, 4, 0.25);
+  box-shadow: -12px 0 40px rgba(66, 32, 6, 0.2);
+}
+
+html[data-app-theme="lemon-icecream"] .notes-drawer-header {
+  background-color: #FEF3C7;
+  border-bottom: 1px solid rgba(202, 138, 4, 0.25);
+}
+
+html[data-app-theme="lemon-icecream"] .notes-header-title {
+  color: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .notes-header-title svg {
+  stroke: #CA8A04;
+}
+
+html[data-app-theme="lemon-icecream"] .notes-book-title {
+  color: #78350F;
+}
+
+html[data-app-theme="lemon-icecream"] .notes-save-status {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+}
+
+html[data-app-theme="lemon-icecream"] .notes-header-actions .btn-icon {
+  background-color: #FEF08A;
+  color: #422006;
+  border: 1px solid rgba(202, 138, 4, 0.35);
+}
+
+html[data-app-theme="lemon-icecream"] .notes-header-actions .btn-icon:hover {
+  background-color: #FDE047;
+  color: #3B2314;
+  border-color: #CA8A04;
+}
+
+/* Action Bar: Replaces dark slate bar with warm cream and high-contrast buttons */
+html[data-app-theme="lemon-icecream"] .notes-actions-bar {
+  background-color: #FFFBEB;
+  border-bottom: 1px solid rgba(202, 138, 4, 0.22);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-action {
+  background-color: #FEF08A;
+  color: #422006;
+  border: 1px solid rgba(202, 138, 4, 0.38);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(66, 32, 6, 0.06);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-action svg {
+  stroke: #422006;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-action:hover {
+  background-color: #FDE047;
+  color: #422006;
+  border-color: #CA8A04;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.25);
+  transform: translateY(-1px);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-action:hover svg {
+  stroke: #422006;
+}
+
+/* Markdown Toolbar: Replaces dark slate bar with lemon palette */
+html[data-app-theme="lemon-icecream"] .notes-markdown-toolbar {
+  background-color: #FEF3C7;
+  border-bottom: 1px solid rgba(202, 138, 4, 0.25);
+}
+
+/* Segmented View Mode Tabs (Editar / Previa) */
+html[data-app-theme="lemon-icecream"] .notes-view-tabs {
+  background-color: #FEF08A;
+  border: 1px solid rgba(202, 138, 4, 0.35);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab {
+  color: #78350F;
+  font-weight: 600;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab svg {
+  stroke: #78350F;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab:hover {
+  color: #3B2314;
+  background-color: #FDE68A;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab:hover svg {
+  stroke: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab.active {
+  background-color: #EAB308;
+  color: #422006;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(202, 138, 4, 0.35);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-notes-tab.active svg {
+  stroke: #422006;
+}
+
+/* Formatting Tool Buttons (H1-H3, B, I, S, Highlight, etc.) */
+html[data-app-theme="lemon-icecream"] .btn-tool {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(202, 138, 4, 0.35);
+  color: #422006;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(66, 32, 6, 0.05);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool svg {
+  color: #422006;
+  stroke: #422006;
+  fill: currentColor;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool.tool-bold strong,
+html[data-app-theme="lemon-icecream"] .btn-tool.tool-italic em,
+html[data-app-theme="lemon-icecream"] .btn-tool.tool-strike s {
+  color: #422006;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool:hover {
+  background-color: #FDE047;
+  color: #3B2314;
+  border-color: #CA8A04;
+  transform: translateY(-1px);
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool:hover svg {
+  color: #3B2314;
+  stroke: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool:hover strong,
+html[data-app-theme="lemon-icecream"] .btn-tool:hover em,
+html[data-app-theme="lemon-icecream"] .btn-tool:hover s {
+  color: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .btn-tool:active {
+  transform: translateY(0);
+}
+
+html[data-app-theme="lemon-icecream"] .tool-highlight-badge {
+  background-color: #FEF08A;
+  color: #78350F;
+  border: 1px solid #CA8A04;
+}
+
+html[data-app-theme="lemon-icecream"] .toolbar-divider,
+html[data-app-theme="lemon-icecream"] .toolbar-divider-sm {
+  background-color: rgba(202, 138, 4, 0.35);
+}
+
+/* Editor Body & Textarea */
+html[data-app-theme="lemon-icecream"] .notes-editor-body {
+  background-color: #FFFDF2;
+}
+
+html[data-app-theme="lemon-icecream"] .reader-notes-textarea {
+  color: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .reader-notes-textarea::placeholder {
+  color: #92400E;
+}
+
+/* Notes Live Preview (Obsidian Markdown Rendered) */
+html[data-app-theme="lemon-icecream"] .reader-notes-preview {
+  color: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .reader-notes-preview strong {
+  color: #3B2314;
+}
+
+html[data-app-theme="lemon-icecream"] .reader-notes-preview em {
+  color: #78350F;
+}
+
+html[data-app-theme="lemon-icecream"] .reader-notes-preview del {
+  color: #92400E;
+}
+
+html[data-app-theme="lemon-icecream"] .obsidian-highlight {
+  background-color: #FEF08A;
+  color: #78350F;
+  border-color: #CA8A04;
+}
+
+html[data-app-theme="lemon-icecream"] .obsidian-inline-code {
+  background-color: rgba(202, 138, 4, 0.12);
+  color: #92400E;
+  border: 1px solid rgba(202, 138, 4, 0.28);
+}
+
+html[data-app-theme="lemon-icecream"] .notes-drawer-footer {
+  background-color: #FEF3C7;
+  border-top: 1px solid rgba(202, 138, 4, 0.25);
+  color: #78350F;
+}
+
+/* ==========================================================================
    High-Contrast Reader Controls for Light Themes (Lemon Ice-Cream & Clean Light)
    Fixes dark-on-dark contrast on floating TOC/bookmarks FAB, notes tab, and
    navigation controls against dark reader chrome without affecting other themes.
@@ -4097,9 +4431,9 @@ html[data-app-theme="lemon-icecream"] .reader-floating-toc-btn:hover svg {
 }
 
 html[data-app-theme="lemon-icecream"] .reader-floating-toc-wrap .bookmark-count-badge {
-  background-color: #CA8A04;
-  color: #FFFFFF;
-  border-color: #FEF3C7;
+  background-color: #3B2314;
+  color: #FEF3C7;
+  border: 1px solid #CA8A04;
 }
 
 html[data-app-theme="lemon-icecream"] .reader-notes-tab {
@@ -4163,13 +4497,13 @@ html[data-app-theme="lemon-icecream"] .btn-page-go svg {
 
 html[data-app-theme="lemon-icecream"] .btn-page-go:hover {
   background-color: #CA8A04;
-  color: #FFFFFF;
+  color: #422006;
   border-color: #A16207;
   transform: scale(1.1);
 }
 
 html[data-app-theme="lemon-icecream"] .btn-page-go:hover svg {
-  stroke: #FFFFFF;
+  stroke: #422006;
 }
 
 html[data-app-theme="lemon-icecream"] .reader-page-jump-label,
@@ -4878,7 +5212,7 @@ html[data-app-theme="lemon-icecream"] .tour-btn-next {
 
 html[data-app-theme="lemon-icecream"] .tour-btn-next:hover {
   background-color: #CA8A04;
-  color: #FFFFFF;
+  color: #422006;
 }
 
 html[data-app-theme="lemon-icecream"] .tour-btn-prev {
@@ -4915,12 +5249,16 @@ html[data-app-theme="lemon-icecream"] .tour-welcome-tip-text {
   color: #78350F;
 }
 
+html[data-app-theme="lemon-icecream"] .header-manual-btn,
+html[data-app-theme="lemon-icecream"] .header-theme-btn,
 html[data-app-theme="lemon-icecream"] .header-tour-btn {
   background-color: #FEF3C7;
   color: #78350F;
   border-color: rgba(202, 138, 4, 0.3);
 }
 
+html[data-app-theme="lemon-icecream"] .header-manual-btn:hover,
+html[data-app-theme="lemon-icecream"] .header-theme-btn:hover,
 html[data-app-theme="lemon-icecream"] .header-tour-btn:hover {
   background-color: #FDE68A;
   color: #3B2314;

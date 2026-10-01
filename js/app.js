@@ -227,7 +227,7 @@ class AppController {
   }
 
   initTheme() {
-    const savedTheme = localStorage.getItem('licbook_app_theme') || 'cyber-emerald';
+    const savedTheme = localStorage.getItem('licbook_app_theme') || 'lemon-icecream';
     this.applyTheme(savedTheme);
   }
 
@@ -243,7 +243,7 @@ class AppController {
   }
 
   openThemeModal() {
-    const currentTheme = localStorage.getItem('licbook_app_theme') || 'cyber-emerald';
+    const currentTheme = localStorage.getItem('licbook_app_theme') || 'lemon-icecream';
     this.applyTheme(currentTheme);
 
     const overlay = document.getElementById('theme-modal-overlay');
