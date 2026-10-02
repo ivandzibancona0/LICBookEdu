@@ -4814,6 +4814,308 @@ html[data-app-theme="clean-light"] .books-list .card-options-btn:hover svg {
   stroke: #0F172A;
 }
 
+/* Catalog Card: Badge de categoría y Botón Play de lectura rápida */
+html[data-app-theme="clean-light"] .card-badge {
+  background-color: #2563EB;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+html[data-app-theme="clean-light"] .btn-quick-read {
+  background-color: #2563EB;
+  color: #FFFFFF;
+}
+
+html[data-app-theme="clean-light"] .btn-quick-read svg {
+  fill: #FFFFFF;
+}
+
+html[data-app-theme="clean-light"] .btn-quick-read:hover {
+  background-color: #1D4ED8;
+  color: #FFFFFF;
+}
+
+/* 3. Clean Light Reader Notes Drawer (Libreta de Apuntes) Styling & Contrast */
+html[data-app-theme="clean-light"] .reader-notes-drawer {
+  background-color: #FFFFFF;
+  border-left: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: -10px 0 35px rgba(15, 23, 42, 0.12);
+}
+
+html[data-app-theme="clean-light"] .notes-drawer-header {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+html[data-app-theme="clean-light"] .notes-header-title {
+  color: #0F172A;
+}
+
+html[data-app-theme="clean-light"] .notes-header-title svg {
+  stroke: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .notes-book-title {
+  color: #64748B;
+}
+
+html[data-app-theme="clean-light"] .notes-save-status {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+html[data-app-theme="clean-light"] .notes-header-actions .btn-icon {
+  background-color: #F1F5F9;
+  color: #0F172A;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-app-theme="clean-light"] .notes-header-actions .btn-icon:hover {
+  background-color: #E2E8F0;
+  color: #2563EB;
+  border-color: #2563EB;
+}
+
+/* Action Bar: Replaces dark slate bar with clean light background & high-contrast buttons */
+html[data-app-theme="clean-light"] .notes-actions-bar {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-action {
+  background-color: #FFFFFF;
+  color: #1E293B;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-action svg {
+  stroke: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .btn-notes-action:hover {
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+  border-color: #2563EB;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-action:hover svg {
+  stroke: #1D4ED8;
+}
+
+/* Markdown Toolbar: Replaces dark bar with clear palette */
+html[data-app-theme="clean-light"] .notes-markdown-toolbar {
+  background-color: #F1F5F9;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  backdrop-filter: none;
+}
+
+/* Segmented View Mode Tabs (Editar / Previa) */
+html[data-app-theme="clean-light"] .notes-view-tabs {
+  background-color: #E2E8F0;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab {
+  color: #475569;
+  font-weight: 600;
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab svg {
+  stroke: #475569;
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab:hover {
+  color: #0F172A;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab:hover svg {
+  stroke: #0F172A;
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab.active {
+  background-color: #2563EB;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
+}
+
+html[data-app-theme="clean-light"] .btn-notes-tab.active svg {
+  stroke: #FFFFFF;
+}
+
+/* Formatting Tool Buttons (H1-H3, B, I, S, Highlight, etc.) */
+html[data-app-theme="clean-light"] .btn-tool {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  color: #1E293B;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+html[data-app-theme="clean-light"] .btn-tool svg {
+  color: #1E293B;
+  stroke: #1E293B;
+  fill: currentColor;
+}
+
+html[data-app-theme="clean-light"] .btn-tool svg[fill="none"] {
+  fill: none;
+}
+
+html[data-app-theme="clean-light"] .btn-tool.tool-bold strong,
+html[data-app-theme="clean-light"] .btn-tool.tool-italic em,
+html[data-app-theme="clean-light"] .btn-tool.tool-strike s {
+  color: #1E293B;
+}
+
+html[data-app-theme="clean-light"] .btn-tool:hover {
+  background-color: #EFF6FF;
+  color: #2563EB;
+  border-color: #2563EB;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+html[data-app-theme="clean-light"] .btn-tool:hover svg {
+  color: #2563EB;
+  stroke: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .btn-tool:hover strong,
+html[data-app-theme="clean-light"] .btn-tool:hover em,
+html[data-app-theme="clean-light"] .btn-tool:hover s {
+  color: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .btn-tool:active {
+  transform: translateY(0);
+}
+
+html[data-app-theme="clean-light"] .tool-highlight-badge {
+  background-color: #FEF08A;
+  color: #854D0E;
+  border: 1px solid #CA8A04;
+}
+
+html[data-app-theme="clean-light"] .toolbar-divider,
+html[data-app-theme="clean-light"] .toolbar-divider-sm {
+  background-color: rgba(15, 23, 42, 0.15);
+}
+
+/* Editor Body & Textarea */
+html[data-app-theme="clean-light"] .notes-editor-body {
+  background-color: #FFFFFF;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-textarea {
+  color: #0F172A;
+  scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-textarea::placeholder {
+  color: #94A3B8;
+}
+
+/* Notes Live Preview (Obsidian Markdown Rendered) */
+html[data-app-theme="clean-light"] .reader-notes-preview {
+  color: #0F172A;
+  scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview strong {
+  color: #0F172A;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview em {
+  color: #334155;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview del {
+  color: #64748B;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h1 {
+  color: #1D4ED8;
+  border-bottom-color: rgba(37, 99, 235, 0.25);
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h2 {
+  color: #0284C7;
+  border-bottom-color: rgba(2, 132, 199, 0.2);
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h3 {
+  color: #B45309;
+}
+
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h4,
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h5,
+html[data-app-theme="clean-light"] .reader-notes-preview .obsidian-h6 {
+  color: #6D28D9;
+}
+
+html[data-app-theme="clean-light"] .obsidian-highlight {
+  background-color: #FEF08A;
+  color: #854D0E;
+  border: 1px solid #EAB308;
+}
+
+html[data-app-theme="clean-light"] .obsidian-inline-code {
+  background-color: #F1F5F9;
+  color: #BE123C;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-app-theme="clean-light"] .obsidian-code-block {
+  background-color: #0F172A;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  color: #F8FAFC;
+}
+
+html[data-app-theme="clean-light"] .obsidian-quote {
+  border-left-color: #2563EB;
+  background-color: rgba(37, 99, 235, 0.06);
+  color: #334155;
+}
+
+html[data-app-theme="clean-light"] .obsidian-wikilink {
+  color: #6D28D9;
+  background-color: rgba(109, 40, 217, 0.08);
+}
+
+html[data-app-theme="clean-light"] .obsidian-link {
+  color: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .obsidian-link:hover {
+  color: #1D4ED8;
+}
+
+html[data-app-theme="clean-light"] .obsidian-hr {
+  border-top-color: rgba(15, 23, 42, 0.12);
+}
+
+html[data-app-theme="clean-light"] .obsidian-task-checkbox {
+  accent-color: #2563EB;
+}
+
+html[data-app-theme="clean-light"] .obsidian-empty-preview {
+  color: #64748B;
+}
+
+/* Notes Footer */
+html[data-app-theme="clean-light"] .notes-drawer-footer {
+  background-color: #F8FAFC;
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  color: #64748B;
+}
+
 /* ==========================================================================
    Interactive Guided Tour System Styles
    Spotlight overlay, glowing pulse ring, tooltip popover, and welcome modal
