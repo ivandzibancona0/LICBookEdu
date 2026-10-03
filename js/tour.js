@@ -94,9 +94,15 @@ class TourManager {
 
     const btnSkipWelcome = document.getElementById('btn-tour-skip-welcome');
     if (btnSkipWelcome) {
-      btnSkipWelcome.addEventListener('click', () => {
+      btnSkipWelcome.addEventListener('click', async () => {
         this.markTourAsSeen();
         this.closeWelcomeModal();
+        if (window.storage && typeof window.storage.removeSampleBooks === 'function') {
+          await window.storage.removeSampleBooks();
+        }
+        if (window.catalog && typeof window.catalog.render === 'function') {
+          await window.catalog.render();
+        }
       });
     }
 

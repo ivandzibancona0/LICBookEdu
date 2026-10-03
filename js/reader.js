@@ -34,6 +34,8 @@ class ReaderEngine {
 
     // Advanced Navigation & Search
     this.outline = null;
+    this.detectedOutline = null;
+    this.pageOffset = 0;
     this.pageLabels = null;
     this.activeNavTab = 'toc';
     this.searchResults = [];
@@ -416,6 +418,8 @@ class ReaderEngine {
    */
   async loadDocument(book) {
     const blob = await window.storage.getBookBlob(book.id);
+    this.pageOffset = book.pageOffset || 0;
+    this.detectedOutline = null;
 
     if (blob && window.pdfjsLib) {
       try {
@@ -439,6 +443,15 @@ class ReaderEngine {
         } catch (e) {
           console.warn('Could not load PDF page labels:', e);
           this.pageLabels = null;
+        }
+
+        // Automatic smart scan for visual index if no native outline exists
+        if ((!this.outline || this.outline.length === 0) && this.pdfDoc) {
+          this.autoDetectOutline(35).then(() => {
+            if (this.activeNavTab === 'toc') {
+              this.renderOutline();
+            }
+          }).catch(err => console.warn('Background auto-detect outline failed:', err));
         }
       } catch (err) {
         console.warn('PDF loading error, using high-fidelity fallback viewer:', err);
@@ -1028,6 +1041,9 @@ class ReaderEngine {
     this.closeSearchBar();
     this.closeNotesDrawer();
 
+    this.detectedOutline = null;
+    this.pageOffset = 0;
+
     this.container.classList.remove('active');
     this.saveProgress();
     if (window.catalog) {
@@ -1097,6 +1113,9 @@ class ReaderEngine {
           if (textLayerTask && textLayerTask.promise) {
             await textLayerTask.promise;
           }
+
+          // Smart TOC Linker: Enhance page with interactive clickable index links
+          this.enhancePageWithSmartLinks(pageNum, textContent, viewport, card || textLayer.parentElement);
         }
 
         // Render Interactive Annotation Layer (clickable links, footnotes, chapters & URLs)
@@ -1369,16 +1388,83 @@ class ReaderEngine {
   }
 
   /**
-   * Renders the Table of Contents / Outline tree
+   * Renders header for TOC with auto-detection info and page offset calibrator
+   */
+  renderTOCHeader(isAutoDetected = false, itemCount = 0) {
+    const offset = this.pageOffset || 0;
+    const headerEl = document.createElement('div');
+    headerEl.className = 'toc-smart-header';
+    headerEl.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span class="toc-smart-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          <span>${isAutoDetected ? `Índice Detectado (${itemCount})` : 'Índice de Capítulos'}</span>
+        </span>
+        ${isAutoDetected ? `
+          <button type="button" class="btn-rescan-toc" id="btn-rescan-toc" title="Re-escanear documento" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px; padding:2px 6px; border-radius:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            <span>Escanear</span>
+          </button>` : ''}
+      </div>
+      <div class="toc-offset-control">
+        <span title="Ajusta el desfase si el número impreso del libro difiere de la página real del PDF (ej: portada y prólogo)">
+          Calibrar desfase:
+        </span>
+        <div class="toc-offset-buttons">
+          <button type="button" class="toc-offset-btn" id="btn-offset-minus" title="Restar 1 página">−</button>
+          <span class="toc-offset-value" id="toc-offset-display">${offset > 0 ? `+${offset}` : offset}</span>
+          <button type="button" class="toc-offset-btn" id="btn-offset-plus" title="Sumar 1 página">+</button>
+        </div>
+      </div>
+    `;
+
+    const btnMinus = headerEl.querySelector('#btn-offset-minus');
+    const btnPlus = headerEl.querySelector('#btn-offset-plus');
+    const btnRescan = headerEl.querySelector('#btn-rescan-toc');
+
+    if (btnMinus) {
+      btnMinus.onclick = (e) => {
+        e.stopPropagation();
+        this.setPageOffset((this.pageOffset || 0) - 1);
+      };
+    }
+    if (btnPlus) {
+      btnPlus.onclick = (e) => {
+        e.stopPropagation();
+        this.setPageOffset((this.pageOffset || 0) + 1);
+      };
+    }
+    if (btnRescan) {
+      btnRescan.onclick = async (e) => {
+        e.stopPropagation();
+        this.detectedOutline = null;
+        const tocList = document.getElementById('reader-toc-list');
+        if (tocList) {
+          tocList.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Escaneando documento...</div>';
+        }
+        await this.autoDetectOutline(60);
+        this.renderOutline();
+      };
+    }
+
+    return headerEl;
+  }
+
+  /**
+   * Renders the Table of Contents / Outline tree with offset control and auto-detected TOC
    */
   async renderOutline() {
     const tocList = document.getElementById('reader-toc-list');
     if (!tocList || !this.currentBook) return;
 
+    const offset = this.pageOffset || 0;
+
     if (this.outline && this.outline.length > 0) {
+      // 1. Native PDF Outline
       tocList.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Cargando índice...</div>';
 
       const fragment = document.createDocumentFragment();
+      fragment.appendChild(this.renderTOCHeader(false, this.outline.length));
 
       const renderLevel = async (items, level = 0) => {
         for (const item of items) {
@@ -1397,14 +1483,15 @@ class ReaderEngine {
           itemEl.appendChild(titleSpan);
 
           if (targetPage) {
+            const effectivePage = Math.max(1, Math.min(this.numPages, targetPage + offset));
             const pageSpan = document.createElement('span');
             pageSpan.className = 'toc-item-page';
-            pageSpan.textContent = this.getPageLabel(targetPage);
+            pageSpan.textContent = this.getPageLabel(effectivePage);
             itemEl.appendChild(pageSpan);
 
             itemEl.onclick = (e) => {
               e.stopPropagation();
-              this.goToPage(targetPage);
+              this.goToPage(effectivePage);
               const popover = document.getElementById('reader-bookmarks-popover');
               if (popover) popover.classList.remove('show');
             };
@@ -1427,8 +1514,43 @@ class ReaderEngine {
       tocList.innerHTML = '';
       tocList.appendChild(fragment);
 
+    } else if (this.detectedOutline && this.detectedOutline.length > 0) {
+      // 2. Smart Auto-Detected TOC
+      tocList.innerHTML = '';
+      const fragment = document.createDocumentFragment();
+      fragment.appendChild(this.renderTOCHeader(true, this.detectedOutline.length));
+
+      for (const item of this.detectedOutline) {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'toc-item';
+
+        const effectivePage = Math.max(1, Math.min(this.numPages, item.page + offset));
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'toc-item-title';
+        titleSpan.textContent = item.title;
+        titleSpan.title = item.title;
+        itemEl.appendChild(titleSpan);
+
+        const pageSpan = document.createElement('span');
+        pageSpan.className = 'toc-item-page';
+        pageSpan.textContent = `Pág. ${effectivePage}`;
+        itemEl.appendChild(pageSpan);
+
+        itemEl.onclick = (e) => {
+          e.stopPropagation();
+          this.goToPage(effectivePage);
+          const popover = document.getElementById('reader-bookmarks-popover');
+          if (popover) popover.classList.remove('show');
+        };
+
+        fragment.appendChild(itemEl);
+      }
+
+      tocList.appendChild(fragment);
+
     } else if (!this.pdfDoc && this.numPages > 1) {
-      // Synthetic TOC for sample books
+      // 3. Synthetic TOC for sample books
       tocList.innerHTML = '';
       for (let p = 1; p <= this.numPages; p += 2) {
         const chapNum = Math.ceil(p / 2);
@@ -1446,7 +1568,7 @@ class ReaderEngine {
         tocList.appendChild(itemEl);
       }
     } else {
-      // Friendly fallback for PDFs without embedded outline
+      // 4. Fallback with direct scan button
       tocList.innerHTML = `
         <div class="empty-toc">
           <div class="empty-toc-icon">
@@ -1458,9 +1580,325 @@ class ReaderEngine {
             </svg>
           </div>
           <p class="empty-toc-title">Sin índice de capítulos</p>
-          <p class="empty-toc-desc">Este documento PDF no incluye un índice digital predefinido. Puedes usar la búsqueda de texto (Ctrl + F) o marcar capítulos clave con marcapáginas.</p>
+          <p class="empty-toc-desc">Este documento PDF no incluye un índice digital predefinido. Puedes escanear las páginas del documento para detectarlo automáticamente.</p>
+          <button type="button" class="btn-primary" id="btn-manual-scan-toc" style="margin-top: 10px; font-size: 0.82rem; padding: 7px 14px; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Detectar índice del documento</span>
+          </button>
         </div>
       `;
+
+      const btnScan = tocList.querySelector('#btn-manual-scan-toc');
+      if (btnScan) {
+        btnScan.onclick = async () => {
+          btnScan.disabled = true;
+          btnScan.innerHTML = '<span>Escaneando páginas...</span>';
+          await this.autoDetectOutline(60);
+          this.renderOutline();
+        };
+      }
+    }
+  }
+
+  /**
+   * Sets and persists page offset for the current book, refreshing TOC and on-page links
+   */
+  async setPageOffset(offset) {
+    this.pageOffset = offset;
+    if (this.currentBook) {
+      this.currentBook.pageOffset = offset;
+      if (window.storage && window.storage.saveLibraryData) {
+        await window.storage.saveLibraryData();
+      }
+    }
+
+    // Update offset display if visible
+    const displayEl = document.getElementById('toc-offset-display');
+    if (displayEl) {
+      displayEl.textContent = offset > 0 ? `+${offset}` : String(offset);
+    }
+
+    // Refresh TOC items
+    this.renderOutline();
+
+    // Refresh all rendered page smart links
+    this.refreshSmartLinksOnRenderedPages();
+  }
+
+  /**
+   * Refreshes smart link targets and tooltips on currently rendered pages
+   */
+  refreshSmartLinksOnRenderedPages() {
+    const offset = this.pageOffset || 0;
+    const links = document.querySelectorAll('.smart-index-link');
+    links.forEach(link => {
+      const rawPage = parseInt(link.dataset.rawPage, 10);
+      const title = link.dataset.title || '';
+      if (!isNaN(rawPage)) {
+        const effectivePage = Math.max(1, Math.min(this.numPages, rawPage + offset));
+        link.title = `Saltar a página ${effectivePage}${offset !== 0 ? ` (Texto: ${rawPage}, Desfase: ${offset > 0 ? '+' : ''}${offset})` : ''} - ${title}`;
+        const badgeSpan = link.querySelector('.smart-index-badge span');
+        if (badgeSpan) {
+          badgeSpan.textContent = `Pág. ${effectivePage}`;
+        }
+        link.onclick = (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          this.goToPage(effectivePage);
+          if (window.app && window.app.showToast) {
+            window.app.showToast(`Navegando a: ${title} (Pág. ${effectivePage})`, 2200);
+          }
+        };
+      }
+    });
+  }
+
+  /**
+   * Converts a roman numeral string to an integer
+   */
+  romanToInt(roman) {
+    if (!roman) return 0;
+    const values = { i: 1, v: 5, x: 10, l: 50, c: 100, d: 500, m: 1000 };
+    const str = String(roman).toLowerCase().trim();
+    let total = 0;
+    let prevValue = 0;
+    for (let i = str.length - 1; i >= 0; i--) {
+      const val = values[str[i]];
+      if (!val) return 0;
+      if (val < prevValue) {
+        total -= val;
+      } else {
+        total += val;
+        prevValue = val;
+      }
+    }
+    return total;
+  }
+
+  /**
+   * Parses an index line into title and page number
+   */
+  parseIndexLine(lineText) {
+    if (!lineText || typeof lineText !== 'string') return null;
+    const trimmed = lineText.trim();
+    if (trimmed.length < 3) return null;
+
+    const regexPatterns = [
+      // 1. Leader characters (dots, dashes, underscores, spaces) followed by page number or range
+      /^(.*?)(?:[\.\-–—_]{2,}|(?:\s*[\.\-–—_]\s*){3,}|\s{3,})\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})(?:\s*[\-–—]\s*[0-9]{1,4})?\s*$/i,
+      // 2. Explicit (pág. 15), [pág. 15], (15) at end of line
+      /^(.*?)\s*[\(\[]\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})\s*[\)\]]\s*$/i,
+      // 3. Explicit "pág. 15" or "p. 15"
+      /^(.*?)\s+(?:p[áa]g[s]?\.?|p\.?|page)\s+([0-9]{1,4}|[ivxlcdm]{1,8})\s*$/i
+    ];
+
+    for (const regex of regexPatterns) {
+      const match = trimmed.match(regex);
+      if (match) {
+        let rawTitle = match[1].trim();
+        const rawPageStr = match[2].trim();
+
+        // Strip trailing dots/dashes
+        rawTitle = rawTitle.replace(/[\.\-–—_\s]+$/, '').trim();
+        if (rawTitle.length < 2) continue;
+
+        let pageNum = null;
+        if (/^\d+$/.test(rawPageStr)) {
+          pageNum = parseInt(rawPageStr, 10);
+        } else if (/^[ivxlcdm]+$/i.test(rawPageStr)) {
+          pageNum = this.romanToInt(rawPageStr);
+        }
+
+        if (pageNum && pageNum >= 1 && pageNum <= (this.numPages || 9999)) {
+          return {
+            title: rawTitle,
+            page: pageNum,
+            rawPage: rawPageStr
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Groups individual PDF text items into cohesive visual horizontal lines
+   */
+  groupTextItemsIntoLines(items) {
+    if (!items || items.length === 0) return [];
+    const sorted = [...items].sort((a, b) => {
+      const dy = b.transform[5] - a.transform[5];
+      if (Math.abs(dy) > 4) return dy;
+      return a.transform[4] - b.transform[4];
+    });
+
+    const lines = [];
+    let currentLine = null;
+
+    for (const item of sorted) {
+      if (!item.str || !item.str.trim()) continue;
+      const itemY = item.transform[5];
+      const itemX = item.transform[4];
+      const itemW = item.width || 0;
+      const itemH = item.height || Math.abs(item.transform[0]) || 12;
+
+      if (!currentLine || Math.abs(currentLine.y - itemY) > 4) {
+        currentLine = {
+          y: itemY,
+          minY: itemY,
+          maxY: itemY + itemH,
+          minX: itemX,
+          maxX: itemX + itemW,
+          items: [item],
+          text: item.str
+        };
+        lines.push(currentLine);
+      } else {
+        currentLine.items.push(item);
+        currentLine.minX = Math.min(currentLine.minX, itemX);
+        currentLine.maxX = Math.max(currentLine.maxX, itemX + itemW);
+        currentLine.minY = Math.min(currentLine.minY, itemY);
+        currentLine.maxY = Math.max(currentLine.maxY, itemY + itemH);
+        currentLine.text += (currentLine.text.endsWith(' ') || item.str.startsWith(' ') ? '' : ' ') + item.str;
+      }
+    }
+    return lines;
+  }
+
+  /**
+   * Detects and injects interactive clickable links on PDF pages containing visual indexes
+   */
+  enhancePageWithSmartLinks(pageNum, textContent, viewport, pageCard) {
+    if (!pageCard || !textContent || !textContent.items || textContent.items.length === 0) return;
+
+    // Clean any existing smart index layer
+    let smartLayer = pageCard.querySelector('.smart-index-layer');
+    if (smartLayer) {
+      smartLayer.innerHTML = '';
+    }
+
+    const lines = this.groupTextItemsIntoLines(textContent.items);
+    if (!lines || lines.length === 0) return;
+
+    // Check if the page qualifies as an index page
+    const isIndexHeader = lines.some(l => 
+      /^(índice|indice|contenido|tabla de contenido|tabla de contenidos|sumario|table of contents|contents|index)/i.test(l.text.trim())
+    );
+
+    const detectedEntries = [];
+    for (const line of lines) {
+      const parsed = this.parseIndexLine(line.text);
+      if (parsed) {
+        detectedEntries.push({ line, parsed });
+      }
+    }
+
+    // Must have at least 2 detected entries, or 1 entry on a page with an explicit Index header
+    if (detectedEntries.length < (isIndexHeader ? 1 : 2)) return;
+
+    if (!smartLayer) {
+      smartLayer = document.createElement('div');
+      smartLayer.className = 'smart-index-layer';
+      pageCard.appendChild(smartLayer);
+    }
+
+    smartLayer.style.width = Math.floor(viewport.width) + 'px';
+    smartLayer.style.height = Math.floor(viewport.height) + 'px';
+
+    const offset = this.pageOffset || 0;
+
+    for (const { line, parsed } of detectedEntries) {
+      const effectivePage = Math.max(1, Math.min(this.numPages, parsed.page + offset));
+
+      // Calculate viewport coordinates for the line
+      const rect = viewport.convertToViewportRectangle([line.minX, line.minY, line.maxX, line.maxY]);
+      const left = Math.min(rect[0], rect[2]);
+      const top = Math.min(rect[1], rect[3]);
+      const width = Math.abs(rect[2] - rect[0]);
+      const height = Math.max(Math.abs(rect[3] - rect[1]), 22);
+
+      const link = document.createElement('a');
+      link.className = 'smart-index-link';
+      link.dataset.rawPage = parsed.page;
+      link.dataset.title = parsed.title;
+      link.style.left = `${Math.max(0, left - 4)}px`;
+      link.style.top = `${Math.max(0, top - 2)}px`;
+      link.style.width = `${Math.max(width + 8, 120)}px`;
+      link.style.height = `${height + 4}px`;
+      link.title = `Saltar a página ${effectivePage}${offset !== 0 ? ` (Texto: ${parsed.page}, Desfase: ${offset > 0 ? '+' : ''}${offset})` : ''} - ${parsed.title}`;
+
+      link.innerHTML = `
+        <span class="smart-index-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <span>Pág. ${effectivePage}</span>
+        </span>
+      `;
+
+      link.onclick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.goToPage(effectivePage);
+        if (window.app && window.app.showToast) {
+          window.app.showToast(`Navegando a: ${parsed.title} (Pág. ${effectivePage})`, 2200);
+        }
+      };
+
+      smartLayer.appendChild(link);
+    }
+  }
+
+  /**
+   * Scans early pages to extract a full table of contents if none exists in PDF metadata
+   */
+  async autoDetectOutline(maxScanPages = 35) {
+    if (!this.pdfDoc || (this.outline && this.outline.length > 0)) return;
+    if (this.detectedOutline && this.detectedOutline.length > 0) return;
+
+    const limit = Math.min(maxScanPages, this.numPages);
+    const allDetected = [];
+
+    for (let p = 1; p <= limit; p++) {
+      try {
+        const page = await this.pdfDoc.getPage(p);
+        const textContent = await page.getTextContent();
+        const lines = this.groupTextItemsIntoLines(textContent.items);
+
+        const isIndexPage = lines.some(l => 
+          /^(índice|indice|contenido|tabla de contenido|tabla de contenidos|sumario|table of contents|contents|index)/i.test(l.text.trim())
+        );
+
+        const pageEntries = [];
+        for (const line of lines) {
+          const parsed = this.parseIndexLine(line.text);
+          if (parsed) {
+            pageEntries.push({
+              title: parsed.title,
+              page: parsed.page,
+              sourcePage: p
+            });
+          }
+        }
+
+        if (pageEntries.length >= (isIndexPage ? 1 : 2)) {
+          allDetected.push(...pageEntries);
+        }
+      } catch (err) {
+        console.warn('Error scanning page for outline:', p, err);
+      }
+    }
+
+    if (allDetected.length >= 2) {
+      // Remove duplicate consecutive entries
+      const unique = [];
+      const seen = new Set();
+      for (const item of allDetected) {
+        const key = `${item.title}_${item.page}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          unique.push(item);
+        }
+      }
+      this.detectedOutline = unique;
     }
   }
 
