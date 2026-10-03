@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Manual de Usuario](https://img.shields.io/badge/Manual-HTML%20Oficial-success.svg)](manual.html)
+[![Portable App](https://img.shields.io/badge/Windows-Portable%20App-blue.svg)](#-opción-1-ejecutable-portable-recomendado-para-windows)
 [![Local First](https://img.shields.io/badge/Architecture-Local--First-blue.svg)](#características-principales)
 [![Offline Ready](https://img.shields.io/badge/Offline-100%25%20Ready-success.svg)](#tecnologías-y-dependencias)
 
@@ -53,20 +54,40 @@ Personaliza la interfaz con paletas armonizadas y contrastes accesibles:
 
 ## 🚀 Inicio Rápido
 
-Dado que la aplicación utiliza tecnologías web modernas como la *File System Access API* y *Web Workers* para PDF/ePub, se recomienda ejecutarla a través de cualquier servidor HTTP local.
+Dado que la aplicación utiliza tecnologías web modernas como la *File System Access API* e *IndexedDB* para la lectura fluida de PDF y ePub, debe ejecutarse a través de un servidor HTTP local.
 
-### Opción 1: Con Python
+### ⚡ Opción 1: Ejecutable Portable (Recomendado para Windows)
+Solo haz **doble clic** en **`LICBookEdu.exe`**:
+- **Cero dependencias:** No requiere instalar Python, Node.js ni ningún otro runtime externo.
+- **100% Oculto:** El servidor HTTP se inicia en segundo plano en `http://localhost:8080/` sin consolas negras ni ventanas de comando.
+- **Experiencia de Escritorio:** Abre Microsoft Edge automáticamente en modo aplicación (`--app=http://localhost:8080/`), sin barras de navegación innecesarias.
+- **Persistencia garantizada:** Conserva tus libros, notas y datos de lectura en tu perfil local de usuario.
+- **Auto-cierre inteligente:** Al cerrar la ventana de LICBookEdu, el servidor se detiene automáticamente y libera el puerto.
+
+```text
+LICBookEdu.exe
+    ↓ doble clic
+┌────────────────────────┐
+│ inicia servidor        │
+│ localhost:8080 (oculto)│
+│ abre Edge en modo app  │
+└────────────────────────┘
+    ↓
+📚 LICBookEdu
+```
+
+### Opción 2: Con Python
 ```bash
 python -m http.server 8080
 ```
 Abre tu navegador en: `http://localhost:8080`
 
-### Opción 2: Con Node.js / npx
+### Opción 3: Con Node.js / npx
 ```bash
 npx serve .
 ```
 
-### Opción 3: Con VS Code
+### Opción 4: Con VS Code
 Instala la extensión **Live Server**, haz clic derecho sobre `index.html` y selecciona **"Open with Live Server"**.
 
 ---
@@ -75,9 +96,12 @@ Instala la extensión **Live Server**, haz clic derecho sobre `index.html` y sel
 
 ```text
 LICBook/
-├── assets/                  # Logotipo, favicons y recursos gráficos
+├── LICBookEdu.exe           # Servidor portable y lanzador nativo de Windows (sin dependencias)
+├── launcher/
+│   └── Program.cs           # Código fuente en C# del servidor portable y lanzador
+├── assets/                  # Logotipo, app.ico, manual y recursos gráficos
 ├── css/
-│   └── styles.css           # Sistema de diseño, temas de color y estilos responsivos
+│   └── styles.css           # Sistema de diseño, 8 temas de color y estilos responsivos
 ├── js/
 │   ├── app.js               # Punto de entrada y orquestador principal
 │   ├── bookModal.js         # Ventana modal para agregar y editar metadatos
