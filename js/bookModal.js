@@ -105,6 +105,8 @@ class BookModalManager {
 
     document.getElementById('modal-title-text').textContent = 'Agregar Libro a Mi Biblioteca';
     this.form.reset();
+    const autoScanCb = document.getElementById('book-auto-scan-index');
+    if (autoScanCb) autoScanCb.checked = true;
     document.getElementById('book-id-input').value = '';
     this.dropzoneLabel.textContent = 'Arrastra aquí tu archivo PDF o ePub o haz clic para seleccionarlo';
     this.coverPreviewImg.src = '';
@@ -130,6 +132,8 @@ class BookModalManager {
     document.getElementById('book-publisher').value = book.publisher || '';
     document.getElementById('book-genre').value = book.genre || '';
     document.getElementById('book-description').value = book.description || '';
+    const autoScanCb = document.getElementById('book-auto-scan-index');
+    if (autoScanCb) autoScanCb.checked = book.autoScanIndex !== false;
 
     this.dropzoneLabel.textContent = book.fileName ? `Archivo actual: ${book.fileName} (puedes cambiarlo)` : 'Seleccionar nuevo archivo';
 
@@ -280,7 +284,8 @@ class BookModalManager {
       progressPercent: existingBook ? existingBook.progressPercent : 0,
       lastRead: existingBook ? existingBook.lastRead : new Date().toISOString(),
       isFavorite: existingBook ? existingBook.isFavorite : false,
-      hasCover: Boolean(this.currentCoverDataUrl || (existingBook && existingBook.hasCover))
+      hasCover: Boolean(this.currentCoverDataUrl || (existingBook && existingBook.hasCover)),
+      autoScanIndex: document.getElementById('book-auto-scan-index') ? document.getElementById('book-auto-scan-index').checked : true
     };
 
     // If no cover was extracted or custom uploaded, generate an elegant default one

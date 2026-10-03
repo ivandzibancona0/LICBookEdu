@@ -352,6 +352,25 @@
               <label class="form-label" for="book-description">Resumen / Notas</label>
               <textarea id="book-description" rows="3" placeholder="Sinopsis breve o notas personales sobre el libro..."></textarea>
             </div>
+
+            <!-- Auto-detect Index Preference Option -->
+            <div class="form-group full-width">
+              <label class="form-checkbox-card" for="book-auto-scan-index">
+                <input type="checkbox" id="book-auto-scan-index" checked>
+                <div class="form-checkbox-content">
+                  <span class="form-checkbox-title">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Generar índice inteligente automático
+                  </span>
+                  <span class="form-checkbox-desc">
+                    Escanear y detectar el índice automáticamente si el documento PDF no incluye marcadores o índice digital nativo.
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
 
         </div>

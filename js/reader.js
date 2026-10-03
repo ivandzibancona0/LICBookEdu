@@ -35,6 +35,7 @@ class ReaderEngine {
     // Advanced Navigation & Search
     this.outline = null;
     this.detectedOutline = null;
+    this.destinationCache = new Map();
     this.pageOffset = 0;
     this.pageLabels = null;
     this.activeNavTab = 'toc';
@@ -420,6 +421,7 @@ class ReaderEngine {
     const blob = await window.storage.getBookBlob(book.id);
     this.pageOffset = book.pageOffset || 0;
     this.detectedOutline = null;
+    this.destinationCache = new Map();
 
     if (blob && window.pdfjsLib) {
       try {
@@ -445,8 +447,9 @@ class ReaderEngine {
           this.pageLabels = null;
         }
 
-        // Automatic smart scan for visual index if no native outline exists
-        if ((!this.outline || this.outline.length === 0) && this.pdfDoc) {
+        // Automatic smart scan for visual index if no native outline exists AND user enabled it for this book
+        const allowAutoScan = book.autoScanIndex !== false;
+        if (allowAutoScan && (!this.outline || this.outline.length === 0) && this.pdfDoc) {
           this.autoDetectOutline(35).then(() => {
             if (this.activeNavTab === 'toc') {
               this.renderOutline();
@@ -1042,6 +1045,8 @@ class ReaderEngine {
     this.closeNotesDrawer();
 
     this.detectedOutline = null;
+    this.outline = null;
+    this.destinationCache = new Map();
     this.pageOffset = 0;
 
     this.container.classList.remove('active');
@@ -1115,7 +1120,9 @@ class ReaderEngine {
           }
 
           // Smart TOC Linker: Enhance page with interactive clickable index links
-          this.enhancePageWithSmartLinks(pageNum, textContent, viewport, card || textLayer.parentElement);
+          if (this.currentBook && this.currentBook.autoScanIndex !== false) {
+            this.enhancePageWithSmartLinks(pageNum, textContent, viewport, card || textLayer.parentElement);
+          }
         }
 
         // Render Interactive Annotation Layer (clickable links, footnotes, chapters & URLs)
@@ -1319,6 +1326,18 @@ class ReaderEngine {
     if (typeof dest === 'number') {
       return dest;
     }
+
+    // Fast memory cache lookup
+    const cacheKey = typeof dest === 'string'
+      ? dest
+      : (Array.isArray(dest) && dest[0] && typeof dest[0] === 'object'
+          ? `${dest[0].num}_${dest[0].gen}`
+          : (typeof dest === 'object' ? JSON.stringify(dest) : null));
+
+    if (cacheKey && this.destinationCache && this.destinationCache.has(cacheKey)) {
+      return this.destinationCache.get(cacheKey);
+    }
+
     let explicitDest = dest;
     if (typeof dest === 'string' && this.pdfDoc) {
       try {
@@ -1330,12 +1349,16 @@ class ReaderEngine {
     if (Array.isArray(explicitDest) && explicitDest.length > 0) {
       const pageRef = explicitDest[0];
       if (typeof pageRef === 'number') {
-        return pageRef + 1;
+        const pageNum = pageRef + 1;
+        if (cacheKey && this.destinationCache) this.destinationCache.set(cacheKey, pageNum);
+        return pageNum;
       }
       if (pageRef && typeof pageRef === 'object' && this.pdfDoc) {
         try {
           const pageIndex = await this.pdfDoc.getPageIndex(pageRef);
-          return pageIndex + 1;
+          const pageNum = pageIndex + 1;
+          if (cacheKey && this.destinationCache) this.destinationCache.set(cacheKey, pageNum);
+          return pageNum;
         } catch (e) {
           console.warn('Error resolving page index for destination:', e);
         }
@@ -1460,21 +1483,17 @@ class ReaderEngine {
     const offset = this.pageOffset || 0;
 
     if (this.outline && this.outline.length > 0) {
-      // 1. Native PDF Outline
-      tocList.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Cargando índice...</div>';
-
+      // 1. Native PDF Outline - Instant UI rendering with background batch page resolution
+      tocList.innerHTML = '';
       const fragment = document.createDocumentFragment();
       fragment.appendChild(this.renderTOCHeader(false, this.outline.length));
 
-      const renderLevel = async (items, level = 0) => {
+      const pendingResolutions = [];
+
+      const renderLevel = (items, level = 0) => {
         for (const item of items) {
           const itemEl = document.createElement('div');
           itemEl.className = `toc-item ${level > 0 ? `level-${Math.min(level, 2)}` : ''}`;
-
-          let targetPage = null;
-          if (item.dest) {
-            targetPage = await this.resolveDestination(item.dest);
-          }
 
           const titleSpan = document.createElement('span');
           titleSpan.className = 'toc-item-title';
@@ -1482,37 +1501,58 @@ class ReaderEngine {
           titleSpan.title = item.title || '';
           itemEl.appendChild(titleSpan);
 
-          if (targetPage) {
-            const effectivePage = Math.max(1, Math.min(this.numPages, targetPage + offset));
-            const pageSpan = document.createElement('span');
-            pageSpan.className = 'toc-item-page';
-            pageSpan.textContent = this.getPageLabel(effectivePage);
-            itemEl.appendChild(pageSpan);
+          const pageSpan = document.createElement('span');
+          pageSpan.className = 'toc-item-page';
+          itemEl.appendChild(pageSpan);
 
-            itemEl.onclick = (e) => {
-              e.stopPropagation();
-              this.goToPage(effectivePage);
-              const popover = document.getElementById('reader-bookmarks-popover');
-              if (popover) popover.classList.remove('show');
-            };
-          } else if (item.dest) {
+          // Fast immediate click handler
+          if (item.dest) {
             itemEl.onclick = async (e) => {
               e.stopPropagation();
               await this.goToDestination(item.dest);
+              const popover = document.getElementById('reader-bookmarks-popover');
+              if (popover) popover.classList.remove('show');
             };
+            pendingResolutions.push({ item, pageSpan, itemEl });
           }
 
           fragment.appendChild(itemEl);
 
           if (item.items && item.items.length > 0) {
-            await renderLevel(item.items, level + 1);
+            renderLevel(item.items, level + 1);
           }
         }
       };
 
-      await renderLevel(this.outline, 0);
-      tocList.innerHTML = '';
+      renderLevel(this.outline, 0);
       tocList.appendChild(fragment);
+
+      // Asynchronously resolve page numbers in background batches without locking UI
+      const currentBookId = this.currentBook.id;
+      (async () => {
+        const batchSize = 12;
+        for (let i = 0; i < pendingResolutions.length; i += batchSize) {
+          if (!this.currentBook || this.currentBook.id !== currentBookId) return;
+          const batch = pendingResolutions.slice(i, i + batchSize);
+          await Promise.all(batch.map(async ({ item, pageSpan, itemEl }) => {
+            try {
+              const targetPage = await this.resolveDestination(item.dest);
+              if (targetPage && pageSpan && itemEl) {
+                const effectivePage = Math.max(1, Math.min(this.numPages, targetPage + offset));
+                pageSpan.textContent = this.getPageLabel(effectivePage);
+                itemEl.onclick = (e) => {
+                  e.stopPropagation();
+                  this.goToPage(effectivePage);
+                  const popover = document.getElementById('reader-bookmarks-popover');
+                  if (popover) popover.classList.remove('show');
+                };
+              }
+            } catch (err) {
+              // fallback remains handled by goToDestination
+            }
+          }));
+        }
+      })();
 
     } else if (this.detectedOutline && this.detectedOutline.length > 0) {
       // 2. Smart Auto-Detected TOC
@@ -1569,6 +1609,11 @@ class ReaderEngine {
       }
     } else {
       // 4. Fallback with direct scan button
+      const isAutoScanDisabled = this.currentBook && this.currentBook.autoScanIndex === false;
+      const descText = isAutoScanDisabled
+        ? 'El escaneo automático está desactivado para este libro en sus propiedades. Puedes pulsar el botón a continuación para escanearlo manualmente en cualquier momento.'
+        : 'Este documento PDF no incluye un índice digital predefinido. Puedes escanear las páginas del documento para detectarlo automáticamente.';
+
       tocList.innerHTML = `
         <div class="empty-toc">
           <div class="empty-toc-icon">
@@ -1580,7 +1625,7 @@ class ReaderEngine {
             </svg>
           </div>
           <p class="empty-toc-title">Sin índice de capítulos</p>
-          <p class="empty-toc-desc">Este documento PDF no incluye un índice digital predefinido. Puedes escanear las páginas del documento para detectarlo automáticamente.</p>
+          <p class="empty-toc-desc">${descText}</p>
           <button type="button" class="btn-primary" id="btn-manual-scan-toc" style="margin-top: 10px; font-size: 0.82rem; padding: 7px 14px; justify-content: center;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <span>Detectar índice del documento</span>
@@ -1683,32 +1728,14 @@ class ReaderEngine {
     const trimmed = lineText.trim();
     if (trimmed.length < 3) return null;
 
-    const regexPatterns = [
-      // 1. Leader characters (dots, dashes, underscores, spaces) followed by page number or range
-      /^(.*?)(?:[\.\-–—_]{2,}|(?:\s*[\.\-–—_]\s*){3,}|\s{3,})\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})(?:\s*[\-–—]\s*[0-9]{1,4})?\s*$/i,
-      // 2. Explicit (pág. 15), [pág. 15], (15) at end of line
-      /^(.*?)\s*[\(\[]\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})\s*[\)\]]\s*$/i,
-      // 3. Explicit "pág. 15" or "p. 15"
-      /^(.*?)\s+(?:p[áa]g[s]?\.?|p\.?|page)\s+([0-9]{1,4}|[ivxlcdm]{1,8})\s*$/i
-    ];
-
-    for (const regex of regexPatterns) {
-      const match = trimmed.match(regex);
-      if (match) {
-        let rawTitle = match[1].trim();
-        const rawPageStr = match[2].trim();
-
-        // Strip trailing dots/dashes
-        rawTitle = rawTitle.replace(/[\.\-–—_\s]+$/, '').trim();
-        if (rawTitle.length < 2) continue;
-
-        let pageNum = null;
-        if (/^\d+$/.test(rawPageStr)) {
-          pageNum = parseInt(rawPageStr, 10);
-        } else if (/^[ivxlcdm]+$/i.test(rawPageStr)) {
-          pageNum = this.romanToInt(rawPageStr);
-        }
-
+    // Pattern 1: Title followed by leader (dots, dashes, underscores, spaces) and page number
+    // Clean non-backtracking character class without nested quantifiers (prevents ReDoS)
+    const leaderMatch = trimmed.match(/^(.*?)(?:[\.\-–—_\s]{2,}|\s{2,})\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})(?:\s*[\-–—]\s*[0-9]{1,4})?\s*$/i);
+    if (leaderMatch) {
+      let rawTitle = leaderMatch[1].trim().replace(/[\.\-–—_\s]+$/, '').trim();
+      const rawPageStr = leaderMatch[2].trim();
+      if (rawTitle.length >= 2) {
+        let pageNum = /^\d+$/.test(rawPageStr) ? parseInt(rawPageStr, 10) : this.romanToInt(rawPageStr);
         if (pageNum && pageNum >= 1 && pageNum <= (this.numPages || 9999)) {
           return {
             title: rawTitle,
@@ -1718,6 +1745,58 @@ class ReaderEngine {
         }
       }
     }
+
+    // Pattern 2: Explicit (pág. 15), [pág. 15], (15) at end of line
+    const parenMatch = trimmed.match(/^(.*?)\s*[\(\[]\s*(?:(?:p[áa]g[s]?\.?|p\.?|page)\s*)?([0-9]{1,4}|[ivxlcdm]{1,8})\s*[\)\]]\s*$/i);
+    if (parenMatch) {
+      let rawTitle = parenMatch[1].trim().replace(/[\.\-–—_\s]+$/, '').trim();
+      const rawPageStr = parenMatch[2].trim();
+      if (rawTitle.length >= 2) {
+        let pageNum = /^\d+$/.test(rawPageStr) ? parseInt(rawPageStr, 10) : this.romanToInt(rawPageStr);
+        if (pageNum && pageNum >= 1 && pageNum <= (this.numPages || 9999)) {
+          return {
+            title: rawTitle,
+            page: pageNum,
+            rawPage: rawPageStr
+          };
+        }
+      }
+    }
+
+    // Pattern 3: Explicit "pág. 15" or "p. 15"
+    const pagMatch = trimmed.match(/^(.*?)\s+(?:p[áa]g[s]?\.?|p\.?|page)\s+([0-9]{1,4}|[ivxlcdm]{1,8})\s*$/i);
+    if (pagMatch) {
+      let rawTitle = pagMatch[1].trim().replace(/[\.\-–—_\s]+$/, '').trim();
+      const rawPageStr = pagMatch[2].trim();
+      if (rawTitle.length >= 2) {
+        let pageNum = /^\d+$/.test(rawPageStr) ? parseInt(rawPageStr, 10) : this.romanToInt(rawPageStr);
+        if (pageNum && pageNum >= 1 && pageNum <= (this.numPages || 9999)) {
+          return {
+            title: rawTitle,
+            page: pageNum,
+            rawPage: rawPageStr
+          };
+        }
+      }
+    }
+
+    // Pattern 4: Multi-column or embedded index line (e.g. Column 1 with dots and page number before Column 2)
+    const embeddedMatch = trimmed.match(/(?:^|[\.\-–—_\s]{2,}|\s{2,})([A-ZÁÉÍÓÚ¿¡0-9][^\.\-–—_0-9]{2,}?)(?:[\.\-–—_\s]{2,}|\s{2,})\s*([0-9]{1,4})\b/i);
+    if (embeddedMatch) {
+      let rawTitle = embeddedMatch[1].trim().replace(/[\.\-–—_\s]+$/, '').trim();
+      const rawPageStr = embeddedMatch[2].trim();
+      if (rawTitle.length >= 2) {
+        const pageNum = parseInt(rawPageStr, 10);
+        if (pageNum && pageNum >= 1 && pageNum <= (this.numPages || 9999)) {
+          return {
+            title: rawTitle,
+            page: pageNum,
+            rawPage: rawPageStr
+          };
+        }
+      }
+    }
+
     return null;
   }
 

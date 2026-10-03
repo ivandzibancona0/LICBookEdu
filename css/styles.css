@@ -1741,6 +1741,55 @@ a {
   min-height: 70px;
 }
 
+/* Checkbox Card for Form Preferences */
+.form-checkbox-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.form-checkbox-card:hover {
+  border-color: var(--brand-green);
+  background-color: var(--brand-navy-surface);
+}
+
+.form-checkbox-card input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: 2px !important;
+  cursor: pointer;
+  accent-color: var(--brand-green);
+  flex-shrink: 0;
+}
+
+.form-checkbox-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-checkbox-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.form-checkbox-desc {
+  font-size: 0.77rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
 .modal-footer {
   padding: 16px 24px;
   display: flex;
