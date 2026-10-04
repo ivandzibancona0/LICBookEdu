@@ -59,8 +59,8 @@ Dado que la aplicación utiliza tecnologías web modernas como la *File System A
 ### ⚡ Opción 1: Ejecutable Portable (Recomendado para Windows)
 Solo haz **doble clic** en **`LICBookEdu.exe`**:
 - **Cero dependencias:** No requiere instalar Python, Node.js ni ningún otro runtime externo.
-- **100% Oculto:** El servidor HTTP se inicia en segundo plano en `http://localhost:8080/` sin consolas negras ni ventanas de comando.
-- **Experiencia de Escritorio:** Abre Microsoft Edge automáticamente en modo aplicación (`--app=http://localhost:8080/`), sin barras de navegación innecesarias.
+- **100% Oculto y Dinámico:** El servidor HTTP se inicia en segundo plano buscando el puerto `8080`. Si está ocupado por otra aplicación, busca automáticamente el siguiente puerto libre disponible (hasta el `8099`) sin ventanas negras ni consolas.
+- **Experiencia de Escritorio:** Abre Microsoft Edge automáticamente en modo aplicación (`--app=http://localhost:<puerto>/`), sin barras de navegación innecesarias.
 - **Persistencia garantizada:** Conserva tus libros, notas y datos de lectura en tu perfil local de usuario.
 - **Auto-cierre inteligente:** Al cerrar la ventana de LICBookEdu, el servidor se detiene automáticamente y libera el puerto.
 
@@ -69,7 +69,7 @@ LICBookEdu.exe
     ↓ doble clic
 ┌────────────────────────┐
 │ inicia servidor        │
-│ localhost:8080 (oculto)│
+│ puerto dinámico 8080+  │
 │ abre Edge en modo app  │
 └────────────────────────┘
     ↓

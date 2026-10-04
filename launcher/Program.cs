@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace LICBookEduLauncher
 {
@@ -12,6 +13,7 @@ namespace LICBookEduLauncher
         private static HttpListener _listener;
         private static bool _isRunning = true;
         private static string _baseDir;
+        private static string _activeUrl;
         private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { ".html", "text/html; charset=utf-8" },
@@ -51,19 +53,33 @@ namespace LICBookEduLauncher
 
                 if (!isNewInstance)
                 {
-                    // An instance is already running; open Edge to the running server and exit
-                    LaunchEdge();
+                    // An instance is already running; open Edge to the running server URL and exit
+                    string runningUrl = ReadActiveUrl();
+                    LaunchEdge(runningUrl);
                     return;
                 }
 
-                // Start HTTP Server on localhost:8080
+                // Start HTTP Server with dynamic port allocation (tries 8080 first, then 8081..8099)
                 if (!StartServer())
                 {
+                    try
+                    {
+                        MessageBox.Show(
+                            "No se pudo iniciar el servidor web local de LICBookEdu.\nLos puertos entre el 8080 y el 8099 se encuentran ocupados por otras aplicaciones.",
+                            "LICBook Edu - Puerto Ocupado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }
+                    catch { }
                     return;
                 }
 
+                // Save active URL so secondary instances know which port was bound
+                SaveActiveUrl(_activeUrl);
+
                 // Launch Edge in standalone app mode
-                Process edgeProcess = LaunchEdge();
+                Process edgeProcess = LaunchEdge(_activeUrl);
 
                 // Wait for the user to close Edge, then terminate the server
                 if (edgeProcess != null)
@@ -85,11 +101,37 @@ namespace LICBookEduLauncher
 
         private static bool StartServer()
         {
+            const int startPort = 8080;
+            const int endPort = 8099;
+
+            for (int port = startPort; port <= endPort; port++)
+            {
+                // Try localhost first
+                if (TryBindPort("localhost", port))
+                {
+                    return true;
+                }
+
+                // Fallback to 127.0.0.1 for this port
+                if (TryBindPort("127.0.0.1", port))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryBindPort(string host, int port)
+        {
+            string url = string.Format("http://{0}:{1}/", host, port);
             try
             {
                 _listener = new HttpListener();
-                _listener.Prefixes.Add("http://localhost:8080/");
+                _listener.Prefixes.Add(url);
                 _listener.Start();
+
+                _activeUrl = url;
 
                 Thread listenerThread = new Thread(ListenLoop);
                 listenerThread.IsBackground = true;
@@ -98,33 +140,23 @@ namespace LICBookEduLauncher
             }
             catch
             {
-                // In case port 8080 is blocked, fallback to 127.0.0.1:8080
-                try
+                if (_listener != null)
                 {
-                    if (_listener != null && _listener.IsListening)
+                    try
                     {
-                        _listener.Stop();
+                        _listener.Close();
                     }
-                    _listener = new HttpListener();
-                    _listener.Prefixes.Add("http://127.0.0.1:8080/");
-                    _listener.Start();
-
-                    Thread listenerThread = new Thread(ListenLoop);
-                    listenerThread.IsBackground = true;
-                    listenerThread.Start();
-                    return true;
+                    catch { }
+                    _listener = null;
                 }
-                catch
-                {
-                    // Could not bind port 8080
-                    return false;
-                }
+                return false;
             }
         }
 
         private static void StopServer()
         {
             _isRunning = false;
+            ClearActiveUrl();
             try
             {
                 if (_listener != null)
@@ -137,6 +169,60 @@ namespace LICBookEduLauncher
             {
                 // Ignore shutdown exceptions
             }
+        }
+
+        private static string GetUrlLockFilePath()
+        {
+            string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LICBookEdu");
+            try
+            {
+                if (!Directory.Exists(appData))
+                {
+                    Directory.CreateDirectory(appData);
+                }
+            }
+            catch { }
+            return Path.Combine(appData, "active_server.lock");
+        }
+
+        private static void SaveActiveUrl(string url)
+        {
+            try
+            {
+                File.WriteAllText(GetUrlLockFilePath(), url);
+            }
+            catch { }
+        }
+
+        private static string ReadActiveUrl()
+        {
+            try
+            {
+                string path = GetUrlLockFilePath();
+                if (File.Exists(path))
+                {
+                    string url = File.ReadAllText(path).Trim();
+                    if (!string.IsNullOrEmpty(url) && url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return url;
+                    }
+                }
+            }
+            catch { }
+            return "http://localhost:8080/";
+        }
+
+        private static void ClearActiveUrl()
+        {
+            try
+            {
+                string path = GetUrlLockFilePath();
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            catch { }
         }
 
         private static void ListenLoop()
@@ -243,8 +329,13 @@ namespace LICBookEduLauncher
             }
         }
 
-        private static Process LaunchEdge()
+        private static Process LaunchEdge(string targetUrl)
         {
+            if (string.IsNullOrEmpty(targetUrl))
+            {
+                targetUrl = "http://localhost:8080/";
+            }
+
             string edgePath = FindEdgePath();
             string profileDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LICBookEdu", "EdgeProfile");
 
@@ -265,14 +356,15 @@ namespace LICBookEduLauncher
                 // --user-data-dir keeps Edge isolated and keeps IndexedDB/storage persistent
                 // --disable-background-mode ensures Edge completely exits when window is closed
                 psi.Arguments = string.Format(
-                    "--app=http://localhost:8080/ --user-data-dir=\"{0}\" --no-first-run --no-default-browser-check --disable-background-mode",
+                    "--app={0} --user-data-dir=\"{1}\" --no-first-run --no-default-browser-check --disable-background-mode",
+                    targetUrl,
                     profileDir
                 );
             }
             else
             {
                 // Fallback to default system browser if Edge is not found
-                psi.FileName = "http://localhost:8080/";
+                psi.FileName = targetUrl;
                 psi.UseShellExecute = true;
             }
 
@@ -285,7 +377,7 @@ namespace LICBookEduLauncher
                 // In case of any launch error, fallback to shell execute URL
                 try
                 {
-                    return Process.Start("http://localhost:8080/");
+                    return Process.Start(targetUrl);
                 }
                 catch
                 {
